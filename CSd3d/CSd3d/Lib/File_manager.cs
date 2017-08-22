@@ -5,18 +5,16 @@ namespace CSd3d
 {
     class File_manager
     {
-        private readonly string settingFile_name = "settings.ini";
+        private readonly string settingsFile_name = "settings.ini";
         private readonly string saveFile_name = "savedata.mlr";
-
-        //private readonly string settings_default = "width=640\r\nheight=480\r\nwindowded=true\r\nup=w\r\ndown=s\r\nleft=a\r\nright=d";
-
+       
         public bool read_settings()
         {
             set_default_settings();
 
-            if (File.Exists(settingFile_name))
+            if (File.Exists(settingsFile_name))
             {
-                StreamReader reader = new StreamReader(settingFile_name);
+                StreamReader reader = new StreamReader(settingsFile_name);
                 while (reader.Peek() >= 0)
                 {
                     string line = reader.ReadLine();
@@ -36,6 +34,27 @@ namespace CSd3d
                 }
                 reader.Close();
             }
+            return true;
+        }
+
+        public bool save_settigs()
+        {
+            Console.WriteLine("데이터 저장");
+            if(File.Exists(settingsFile_name))
+            {
+                File.Delete(settingsFile_name);
+            }
+
+            StreamWriter writer = new StreamWriter(settingsFile_name);
+
+            for(int i = 0; i < PublicData_manager.settings_key.Length; i++)
+            {
+                string key = PublicData_manager.settings_key[i].ToString();
+                writer.WriteLine(key + "=" + PublicData_manager.settings[key]);
+            }
+
+            writer.Close();
+
             return true;
         }
 

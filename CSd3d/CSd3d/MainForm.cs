@@ -9,7 +9,7 @@ namespace CSd3d
         {
             InitializeComponent();
 
-            this.KeyDown += new System.Windows.Forms.KeyEventHandler((object sender, KeyEventArgs e) =>
+            this.KeyDown += new KeyEventHandler((object sender, KeyEventArgs e) =>
             {
                 string input = e.KeyCode.ToString().ToLower();
 
@@ -22,7 +22,7 @@ namespace CSd3d
                 else if (input.Equals(PublicData_manager.settings[PublicData_manager.settings_key[6]]))
                     Console.WriteLine("(RIGHT)key DOWN");
             });
-            this.KeyUp += new System.Windows.Forms.KeyEventHandler((object sender, KeyEventArgs e) =>
+            this.KeyUp += new KeyEventHandler((object sender, KeyEventArgs e) =>
             {
                 string input = e.KeyCode.ToString().ToLower();
 
@@ -35,21 +35,29 @@ namespace CSd3d
                 else if (input.Equals(PublicData_manager.settings[PublicData_manager.settings_key[6]]))
                     Console.WriteLine("(RIGHT)key UP");
             });
+
+            this.FormClosed += new FormClosedEventHandler((object sender, FormClosedEventArgs e) =>
+            {
+                File_manager file_Manager = new File_manager();
+                file_Manager.save_settigs();
+            });
+
+            this.디스플레이ToolStripMenuItem.Click += new EventHandler((object sender, EventArgs e) =>
+            {
+                Display_setting modal = new Display_setting(this);
+                modal.ShowDialog();
+            });
         }
-        /*
-        private void pause_btn(object sender, EventArgs e)
+        public void windowsize_adjust()
         {
-            //Console.WriteLine(sender.GetType().ToString());
-            if (!Flagmanager.render_paused)
+            uint width, height;
+            if (!UInt32.TryParse(PublicData_manager.settings[PublicData_manager.settings_key[0]].ToString(), out width)
+            || !UInt32.TryParse(PublicData_manager.settings[PublicData_manager.settings_key[1]].ToString(), out height))
             {
-                Flagmanager.render_paused = true;
-                ((Button)sender).Text = "시작";
+                width = 640;
+                height = 480;
             }
-            else
-            {
-                Flagmanager.render_paused = false;
-                ((Button)sender).Text = "정지";
-            }
-        }*/
+            this.SetBounds(0, 0, (int)width, (int)height);
+        }
     }
 }

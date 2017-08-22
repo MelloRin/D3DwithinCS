@@ -26,14 +26,7 @@ namespace CSd3d
                 filemanager.read_settings();
                 if (d3dHandler.InitallizeApplication(mainForm))
                 {
-                    uint width, height;
-                    if (!UInt32.TryParse(PublicData_manager.settings[PublicData_manager.settings_key[0]].ToString(), out width)
-                    || !UInt32.TryParse(PublicData_manager.settings[PublicData_manager.settings_key[1]].ToString(), out height))
-                    {
-                        width = 640;
-                        height = 480;
-                    }
-                    mainForm.SetBounds(0, 0, (int)width, (int)height);
+                    mainForm.windowsize_adjust();
                     mainForm.Show();
 
                     Console.WriteLine(PublicData_manager.settings[PublicData_manager.settings_key[3]]);
@@ -42,7 +35,7 @@ namespace CSd3d
                     Console.WriteLine(PublicData_manager.settings[PublicData_manager.settings_key[6]]);
                     Console.WriteLine(PublicData_manager.settings[PublicData_manager.settings_key[0]]);
                     Console.WriteLine(PublicData_manager.settings[PublicData_manager.settings_key[1]]);
-
+                    
                     _Td3d.Start();
                 }
                 else
