@@ -22,16 +22,17 @@ namespace CSd3d.Lib
 
             Thread _TmainThread = new Thread(new ThreadStart(() =>
             {
+                File_manager.load_settings();
                 if (d3dHandler.InitallizeApplication(mainForm))
                 {
                     mainForm.windowsize_adjust();
                     mainForm.Show();
 
                     Console.WriteLine(PublicData_manager.settings.get_setting("width") + "*" + PublicData_manager.settings.get_setting("height"));
-                    Console.WriteLine(PublicData_manager.settings.get_setting("up"));
-                    Console.WriteLine(PublicData_manager.settings.get_setting("down"));
-                    Console.WriteLine(PublicData_manager.settings.get_setting("left"));
-                    Console.WriteLine(PublicData_manager.settings.get_setting("right"));
+                    Console.WriteLine(PublicData_manager.settings.get_input_keys("up"));
+                    Console.WriteLine(PublicData_manager.settings.get_input_keys("down"));
+                    Console.WriteLine(PublicData_manager.settings.get_input_keys("left"));
+                    Console.WriteLine(PublicData_manager.settings.get_input_keys("right"));
                     _Td3d.Start();
                 }
                 else

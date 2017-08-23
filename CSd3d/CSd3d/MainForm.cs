@@ -15,27 +15,33 @@ namespace CSd3d
             {
                 string input = e.KeyCode.ToString().ToLower();
 
-                if (input.Equals(PublicData_manager.settings[PublicData_manager.settings_key[3]]))
-                    Console.WriteLine("(UP)key DOWN");
-                else if (input.Equals(PublicData_manager.settings[PublicData_manager.settings_key[4]]))
-                    Console.WriteLine("(DOWN)key DOWN");
-                else if (input.Equals(PublicData_manager.settings[PublicData_manager.settings_key[5]]))
-                    Console.WriteLine("(LEFT)key DOWN");
-                else if (input.Equals(PublicData_manager.settings[PublicData_manager.settings_key[6]]))
-                    Console.WriteLine("(RIGHT)key DOWN");
+                if(PublicData_manager.settings.input_key_search(input))
+                {
+                    if (input.Equals(PublicData_manager.settings.get_input_keys(Setting_manager.input_keys_key[0])))
+                        Console.WriteLine("(UP)key DOWN");
+                    else if (input.Equals(PublicData_manager.settings.get_input_keys(Setting_manager.input_keys_key[1])))
+                        Console.WriteLine("(DOWN)key DOWN");
+                    else if (input.Equals(PublicData_manager.settings.get_input_keys(Setting_manager.input_keys_key[2])))
+                        Console.WriteLine("(LEFT)key DOWN");
+                    else if (input.Equals(PublicData_manager.settings.get_input_keys(Setting_manager.input_keys_key[3])))
+                        Console.WriteLine("(RIGHT)key DOWN");
+                }
             });
             this.KeyUp += new KeyEventHandler((object sender, KeyEventArgs e) =>
             {
                 string input = e.KeyCode.ToString().ToLower();
 
-                if (input.Equals(PublicData_manager.settings[PublicData_manager.settings_key[3]]))
-                    Console.WriteLine("(UP)key UP");
-                else if (input.Equals(PublicData_manager.settings[PublicData_manager.settings_key[4]]))
-                    Console.WriteLine("(DOWN)key UP");
-                else if (input.Equals(PublicData_manager.settings[PublicData_manager.settings_key[5]]))
-                    Console.WriteLine("(LEFT)key UP");
-                else if (input.Equals(PublicData_manager.settings[PublicData_manager.settings_key[6]]))
-                    Console.WriteLine("(RIGHT)key UP");
+                if (PublicData_manager.settings.input_key_search(input))
+                {
+                    if (input.Equals(PublicData_manager.settings.get_input_keys(Setting_manager.input_keys_key[0])))
+                        Console.WriteLine("(UP)key UP");
+                    else if (input.Equals(PublicData_manager.settings.get_input_keys(Setting_manager.input_keys_key[1])))
+                        Console.WriteLine("(DOWN)key UP");
+                    else if (input.Equals(PublicData_manager.settings.get_input_keys(Setting_manager.input_keys_key[2])))
+                        Console.WriteLine("(LEFT)key UP");
+                    else if (input.Equals(PublicData_manager.settings.get_input_keys(Setting_manager.input_keys_key[3])))
+                        Console.WriteLine("(RIGHT)key UP");
+                }
             });
 
             this.FormClosed += new FormClosedEventHandler((object sender, FormClosedEventArgs e) =>
