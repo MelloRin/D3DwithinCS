@@ -2,7 +2,7 @@
 using System.Threading;
 using System.Windows.Forms;
 
-namespace CSd3d
+namespace CSd3d.Lib
 {
     class Thread_manager
     {
@@ -22,20 +22,16 @@ namespace CSd3d
 
             Thread _TmainThread = new Thread(new ThreadStart(() =>
             {
-                File_manager filemanager = new File_manager();
-                filemanager.read_settings();
                 if (d3dHandler.InitallizeApplication(mainForm))
                 {
                     mainForm.windowsize_adjust();
                     mainForm.Show();
 
-                    Console.WriteLine(PublicData_manager.settings[PublicData_manager.settings_key[3]]);
-                    Console.WriteLine(PublicData_manager.settings[PublicData_manager.settings_key[4]]);
-                    Console.WriteLine(PublicData_manager.settings[PublicData_manager.settings_key[5]]);
-                    Console.WriteLine(PublicData_manager.settings[PublicData_manager.settings_key[6]]);
-                    Console.WriteLine(PublicData_manager.settings[PublicData_manager.settings_key[0]]);
-                    Console.WriteLine(PublicData_manager.settings[PublicData_manager.settings_key[1]]);
-                    
+                    Console.WriteLine(PublicData_manager.settings.get_setting("width") + "*" + PublicData_manager.settings.get_setting("height"));
+                    Console.WriteLine(PublicData_manager.settings.get_setting("up"));
+                    Console.WriteLine(PublicData_manager.settings.get_setting("down"));
+                    Console.WriteLine(PublicData_manager.settings.get_setting("left"));
+                    Console.WriteLine(PublicData_manager.settings.get_setting("right"));
                     _Td3d.Start();
                 }
                 else

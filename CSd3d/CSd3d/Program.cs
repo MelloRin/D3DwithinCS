@@ -14,7 +14,7 @@ namespace CSd3d
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            new Thread_manager();
+            new Lib.Thread_manager();
         }
     }
 }

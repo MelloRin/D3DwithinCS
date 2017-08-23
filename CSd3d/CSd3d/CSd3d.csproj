@@ -81,6 +81,7 @@
     <Compile Include="Lib\D3D_handler.cs" />
     <Compile Include="Lib\File_manager.cs" />
     <Compile Include="Lib\PublicData_manager.cs" />
+    <Compile Include="Lib\Setting_manager.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>

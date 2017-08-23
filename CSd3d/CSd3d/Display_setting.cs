@@ -7,9 +7,9 @@ namespace CSd3d
         private MainForm parent_form = null;
         public Display_setting(MainForm mainForm)
         {
-            this.parent_form = mainForm;
             InitializeComponent();
-            this.comboBox1.SelectedIndex = 0;
+            parent_form = mainForm;
+            comboBox1.SelectedIndex = 0;
         }
 
         private void apply_btn_Click(object sender, System.EventArgs e)
@@ -17,8 +17,10 @@ namespace CSd3d
             int selected_index = this.comboBox1.SelectedIndex;
             string selected_setting = this.comboBox1.Items[selected_index].ToString();
 
-            PublicData_manager.settings[PublicData_manager.settings_key[0]] = selected_setting.Split('*')[0];
-            PublicData_manager.settings[PublicData_manager.settings_key[1]] = selected_setting.Split('*')[1];
+            string[] temp = selected_
+
+            PublicData_manager.settings.change_setting("width", selected_setting.Split('*')[0]);
+            PublicData_manager.settings.change_setting("height", selected_setting.Split('*')[1]);
 
             parent_form.Invoke(new MethodInvoker(delegate ()
             {

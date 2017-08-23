@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Windows.Forms;
 
+using CSd3d.Lib;
+
 namespace CSd3d
 {
     public partial class MainForm : Form
@@ -51,13 +53,13 @@ namespace CSd3d
         public void windowsize_adjust()
         {
             uint width, height;
-            if (!UInt32.TryParse(PublicData_manager.settings[PublicData_manager.settings_key[0]].ToString(), out width)
-            || !UInt32.TryParse(PublicData_manager.settings[PublicData_manager.settings_key[1]].ToString(), out height))
+            if (!UInt32.TryParse(PublicData_manager.settings.get_setting("width"), out width)
+            || !UInt32.TryParse(PublicData_manager.settings.get_setting("height"), out height))
             {
                 width = 640;
                 height = 480;
             }
-            this.SetBounds(0, 0, (int)width, (int)height);
+            SetBounds(0, 0, (int)width, (int)height);
         }
     }
 }

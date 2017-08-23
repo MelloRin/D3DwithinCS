@@ -3,7 +3,7 @@ using Microsoft.DirectX.Direct3D;
 using System;
 using System.Drawing;
 
-namespace CSd3d
+namespace CSd3d.Lib
 {
     class D3D_handler : IDisposable
     {
@@ -18,7 +18,7 @@ namespace CSd3d
             this.mainForm = mainForm;
 
             PresentParameters _pp = new PresentParameters();
-            _pp.Windowed = Boolean.Parse(PublicData_manager.settings[PublicData_manager.settings_key[2]].ToString());
+            _pp.Windowed = Boolean.Parse(PublicData_manager.settings.get_setting("windowded"));
             _pp.SwapEffect = SwapEffect.Discard;
 
             try //hw렌더링
@@ -49,7 +49,7 @@ namespace CSd3d
         {
             //Console.WriteLine("메인루프");
 
-            if (PublicData_manager.device_created && !PublicData_manager.render_paused)
+            if (PublicData_manager.device_created)
             {
                 try
                 {
