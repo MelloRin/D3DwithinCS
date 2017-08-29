@@ -1,8 +1,10 @@
-﻿using System;
+﻿using CSd3d.Lib;
+using FileManager;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Windows.Forms;
 
-using CSd3d.Lib;
-using System.Diagnostics;
 
 namespace CSd3d
 {
@@ -12,14 +14,14 @@ namespace CSd3d
         {
             InitializeComponent();
 
-            this.KeyDown += new KeyEventHandler((object sender, KeyEventArgs e) =>
+            KeyDown += new KeyEventHandler((object sender, KeyEventArgs e) =>
             {
                 Stopwatch sw = new Stopwatch();
 
                 sw.Start();
                 string input = e.KeyCode.ToString().ToLower();
 
-                if(PublicData_manager.settings.input_key_search(input))
+                if (PublicData_manager.settings.input_key_search(input))
                 {
                     if (input.Equals(PublicData_manager.settings.get_input_keys(Setting_manager.input_keys_key[0])))
                         Console.WriteLine("(UP)key DOWN");
@@ -32,9 +34,9 @@ namespace CSd3d
                 }
                 sw.Stop();
 
-                Console.WriteLine("{0}ms ",sw.ElapsedMilliseconds);
+                Console.WriteLine("{0}ms ", sw.ElapsedMilliseconds);
             });
-            this.KeyUp += new KeyEventHandler((object sender, KeyEventArgs e) =>
+            KeyUp += new KeyEventHandler((object sender, KeyEventArgs e) =>
             {
                 string input = e.KeyCode.ToString().ToLower();
 
@@ -51,13 +53,47 @@ namespace CSd3d
                 }
             });
 
-            this.FormClosed += new FormClosedEventHandler((object sender, FormClosedEventArgs e) =>
+            FormClosed += new FormClosedEventHandler((object sender, FormClosedEventArgs e) =>
             {
-                File_manager file_Manager = new File_manager();
-                file_Manager.save_settigs();
+                try
+                {
+                    PublicData_manager.dataSet.getdata("Display").hashtable = PublicData_manager.settings.getDisplaytable();
+                }
+                catch (KeyNotFoundException ke)
+                {
+                    Data tempData = new Data();
+                    tempData.hashtable = PublicData_manager.settings.getDisplaytable();
+
+                    PublicData_manager.dataSet.adddata("Display", tempData);
+                }
+
+                try
+                {
+                    PublicData_manager.dataSet.getdata("Input").hashtable = PublicData_manager.settings.getKeytable();
+                }
+                catch (KeyNotFoundException ke)
+                {
+                    Data tempData = new Data();
+                    tempData.hashtable = PublicData_manager.settings.getKeytable();
+
+                    PublicData_manager.dataSet.adddata("Input", tempData);
+                }
+                try
+                {
+                    PublicData_manager.dataSet.getdata("Score").hashtable = PublicData_manager.score.getScoretable();
+                }
+                catch (KeyNotFoundException ke)
+                {
+                    Data tempData = new Data();
+                    tempData.hashtable = PublicData_manager.score.getScoretable();
+
+                    PublicData_manager.dataSet.adddata("Score", tempData);
+                }
+
+                File_manager.save_data(PublicData_manager.dataSet);
             });
 
-            this.디스플레이ToolStripMenuItem.Click += new EventHandler((object sender, EventArgs e) =>
+            디스플레이ToolStripMenuItem.Click += new EventHandler((object sender, EventArgs e) =>
             {
                 Display_setting modal = new Display_setting(this);
                 modal.ShowDialog();

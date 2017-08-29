@@ -28,7 +28,8 @@ namespace CSd3d.Lib
                 PublicData_manager.device_created = true;
                 Console.WriteLine("HW렌더링");
 
-            }catch (DirectXException dxeHW)
+            }
+            catch (DirectXException dxeHW)
             {
                 Console.WriteLine(dxeHW);//sw렌더링
                 try
@@ -37,7 +38,8 @@ namespace CSd3d.Lib
                     CreateFlags.SoftwareVertexProcessing, _pp);
                     PublicData_manager.device_created = true;
                     Console.WriteLine("SW렌더링");
-                }catch (DirectXException dxeSW)
+                }
+                catch (DirectXException dxeSW)
                 {
                     Console.WriteLine(dxeSW);
                 }
@@ -60,7 +62,7 @@ namespace CSd3d.Lib
                     device.EndScene();
                     device.Present();
                 }
-                catch(DirectXException)
+                catch (DirectXException)
                 {
                     Console.WriteLine("D3D 에러");
                 }

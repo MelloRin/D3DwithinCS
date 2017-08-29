@@ -79,8 +79,8 @@
       <DependentUpon>Display_setting.cs</DependentUpon>
     </Compile>
     <Compile Include="Lib\D3D_handler.cs" />
-    <Compile Include="Lib\File_manager.cs" />
     <Compile Include="Lib\PublicData_manager.cs" />
+    <Compile Include="Lib\Savedata_manager.cs" />
     <Compile Include="Lib\Setting_manager.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
@@ -116,6 +116,12 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\FileManager\FileManager\FileManager.csproj">
+      <Project>{41e69564-6015-43bf-a8aa-ab9c10cdaa55}</Project>
+      <Name>FileManager</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

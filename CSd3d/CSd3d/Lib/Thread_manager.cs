@@ -2,27 +2,55 @@
 using System.Threading;
 using System.Windows.Forms;
 
+using FileManager;
+
 namespace CSd3d.Lib
 {
     class Thread_manager
     {
         public Thread_manager()
         {
-            MainForm mainForm = new MainForm();
-            D3D_handler d3dHandler = new D3D_handler();
+            MainForm mainForm = null;// = new MainForm();
+            D3D_handler d3dHandler = null;//new D3D_handler();
 
-            Thread _Td3d = new Thread(new ThreadStart(() =>
+            Thread _Td3d = new Thread(() =>
             {
                 while (mainForm.Created)
                 {
                     d3dHandler.loop();
                     Thread.Sleep(2);
                 }
-            }));
+            });
 
-            Thread _TmainThread = new Thread(new ThreadStart(() =>
+            /*Thread _Tsetdata = new Thread(() =>
             {
-                File_manager.load_settings();
+                if (File_manager.load_data(out PublicData_manager.dataSet))
+                {
+                    new Thread(() =>
+                    {
+                        PublicData_manager.settings.setSetting(PublicData_manager.dataSet);
+                    }).Start();
+
+                    new Thread(() =>
+                    {
+                        PublicData_manager.score.setScore(PublicData_manager.dataSet);
+                    }).Start();
+                }
+            });*/
+
+            Thread _TmainThread = new Thread(() =>
+            {
+
+                if (File_manager.load_data(out PublicData_manager.dataSet))
+                {
+                    //_Tsetdata.Start();
+                    
+                    PublicData_manager.settings.setSetting(PublicData_manager.dataSet);
+                    PublicData_manager.score.setScore(PublicData_manager.dataSet);
+
+                    mainForm = new MainForm();
+                    d3dHandler = new D3D_handler();
+                }
                 if (d3dHandler.InitallizeApplication(mainForm))
                 {
                     mainForm.windowsize_adjust();
@@ -43,7 +71,13 @@ namespace CSd3d.Lib
                     Application.DoEvents();
                     Thread.Sleep(2);
                 }
-            }));
+            });
+
+            /*if (File_manager.load_data(out PublicData_manager.dataSet))
+            {
+                _Tsetdata.Start();
+                
+            }*/
             _TmainThread.Start();
         }
     }

@@ -1,18 +1,32 @@
 ﻿using System.Collections;
+using FileManager;
+using System.Collections.Generic;
 
 namespace CSd3d.Lib
 {
     public class Setting_manager
     {
         private Hashtable settings = new Hashtable();
-        
         private Hashtable input_keys = new Hashtable();
+
         public static readonly string[] settings_key = new string[] { "width", "height", "windowded" };
         public static readonly string[] input_keys_key = new string[] { "up", "down", "left", "right" };
 
-        public Setting_manager()
+        public bool setSetting(DataSet dataSet)
         {
-            set_default_settings();
+            try
+            {
+                if (dataSet.getdata("Display").hashtable.ContainsKey(settings_key[0]))
+                {
+                    settings = PublicData_manager.dataSet.getdata("Display").hashtable;
+                    input_keys = PublicData_manager.dataSet.getdata("Input").hashtable;
+                }
+            }
+            catch(KeyNotFoundException e)
+            {
+                set_default_settings();
+            }
+            return true;
         }
 
         public void config_setting(string key, string value)
@@ -30,6 +44,10 @@ namespace CSd3d.Lib
                 input_keys[key] = value;
             }
         }
+
+        public Hashtable getDisplaytable() => settings;
+
+        public Hashtable getKeytable() => input_keys;
 
         public string get_setting(string key) => settings[key].ToString();
 

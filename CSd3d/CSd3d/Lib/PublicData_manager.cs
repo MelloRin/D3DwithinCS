@@ -1,4 +1,7 @@
-﻿namespace CSd3d
+﻿using CSd3d.Lib;
+using FileManager;
+
+namespace CSd3d
 {
     public static class PublicData_manager
     {
@@ -6,9 +9,8 @@
         public static readonly int render_Delay = 2;
         public static readonly int event_Delay = 2;
 
-        public static readonly string settingsFile_name = "settings.ini";
-        public static readonly string saveFile_name = "savedata.mlr";
-
-        public static Lib.Setting_manager settings = new Lib.Setting_manager();
+        public static DataSet dataSet;
+        public static Setting_manager settings = new Setting_manager();
+        public static Savedata_manager score = new Savedata_manager();
     }
 }
