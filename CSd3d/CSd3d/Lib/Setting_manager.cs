@@ -5,6 +5,7 @@ namespace CSd3d.Lib
     public class Setting_manager
     {
         private Hashtable settings = new Hashtable();
+        
         private Hashtable input_keys = new Hashtable();
         public static readonly string[] settings_key = new string[] { "width", "height", "windowded" };
         public static readonly string[] input_keys_key = new string[] { "up", "down", "left", "right" };

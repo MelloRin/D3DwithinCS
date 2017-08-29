@@ -16,7 +16,7 @@ namespace CSd3d.Lib
                 while (mainForm.Created)
                 {
                     d3dHandler.loop();
-                    Thread.Sleep(PublicData_manager.render_Delay);
+                    Thread.Sleep(2);
                 }
             }));
 
@@ -41,7 +41,7 @@ namespace CSd3d.Lib
                 while (mainForm.Created)
                 {
                     Application.DoEvents();
-                    Thread.Sleep(1);
+                    Thread.Sleep(2);
                 }
             }));
             _TmainThread.Start();

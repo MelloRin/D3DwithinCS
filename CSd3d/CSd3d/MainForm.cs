@@ -2,6 +2,7 @@
 using System.Windows.Forms;
 
 using CSd3d.Lib;
+using System.Diagnostics;
 
 namespace CSd3d
 {
@@ -13,6 +14,9 @@ namespace CSd3d
 
             this.KeyDown += new KeyEventHandler((object sender, KeyEventArgs e) =>
             {
+                Stopwatch sw = new Stopwatch();
+
+                sw.Start();
                 string input = e.KeyCode.ToString().ToLower();
 
                 if(PublicData_manager.settings.input_key_search(input))
@@ -26,6 +30,9 @@ namespace CSd3d
                     else if (input.Equals(PublicData_manager.settings.get_input_keys(Setting_manager.input_keys_key[3])))
                         Console.WriteLine("(RIGHT)key DOWN");
                 }
+                sw.Stop();
+
+                Console.WriteLine("{0}ms ",sw.ElapsedMilliseconds);
             });
             this.KeyUp += new KeyEventHandler((object sender, KeyEventArgs e) =>
             {
