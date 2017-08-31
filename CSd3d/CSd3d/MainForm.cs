@@ -1,7 +1,6 @@
 ﻿using CSd3d.Lib;
 using FileManager;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Windows.Forms;
 
@@ -55,42 +54,13 @@ namespace CSd3d
 
             FormClosed += new FormClosedEventHandler((object sender, FormClosedEventArgs e) =>
             {
-                try
-                {
-                    PublicData_manager.dataSet.getdata("Display").hashtable = PublicData_manager.settings.getDisplaytable();
-                }
-                catch (KeyNotFoundException ke)
-                {
-                    Data tempData = new Data();
-                    tempData.hashtable = PublicData_manager.settings.getDisplaytable();
+                DataSet dataSet = new DataSet();
 
-                    PublicData_manager.dataSet.adddata("Display", tempData);
-                }
+                dataSet.adddata("Display", PublicData_manager.settings.getDisplaytable());
+                dataSet.adddata("Input", PublicData_manager.settings.getKeytable());
+                dataSet.adddata("Score", PublicData_manager.score.getScoretable());
 
-                try
-                {
-                    PublicData_manager.dataSet.getdata("Input").hashtable = PublicData_manager.settings.getKeytable();
-                }
-                catch (KeyNotFoundException ke)
-                {
-                    Data tempData = new Data();
-                    tempData.hashtable = PublicData_manager.settings.getKeytable();
-
-                    PublicData_manager.dataSet.adddata("Input", tempData);
-                }
-                try
-                {
-                    PublicData_manager.dataSet.getdata("Score").hashtable = PublicData_manager.score.getScoretable();
-                }
-                catch (KeyNotFoundException ke)
-                {
-                    Data tempData = new Data();
-                    tempData.hashtable = PublicData_manager.score.getScoretable();
-
-                    PublicData_manager.dataSet.adddata("Score", tempData);
-                }
-
-                File_manager.save_data(PublicData_manager.dataSet);
+                File_manager.save_data(dataSet);
             });
 
             디스플레이ToolStripMenuItem.Click += new EventHandler((object sender, EventArgs e) =>
@@ -112,3 +82,40 @@ namespace CSd3d
         }
     }
 }
+
+/*
+try
+                {
+                    PublicData_manager.dataSet.getdata("Display") = PublicData_manager.settings.getDisplaytable();
+                }
+                catch (KeyNotFoundException)
+                {
+                    Data tempData = new Data();
+                    tempData.hashtable = PublicData_manager.settings.getDisplaytable();
+
+                    PublicData_manager.dataSet.adddata("Display", tempData);
+                }
+
+                try
+                {
+                    PublicData_manager.dataSet.getdata("Input").hashtable = PublicData_manager.settings.getKeytable();
+                }
+                catch (KeyNotFoundException)
+                {
+                    Data tempData = new Data();
+                    tempData.hashtable = PublicData_manager.settings.getKeytable();
+
+                    PublicData_manager.dataSet.adddata("Input", tempData);
+                }
+                try
+                {
+                    PublicData_manager.dataSet.getdata("Score").hashtable = PublicData_manager.score.getScoretable();
+                }
+                catch (KeyNotFoundException)
+                {
+                    Data tempData = new Data();
+                    tempData.hashtable = PublicData_manager.score.getScoretable();
+
+                    PublicData_manager.dataSet.adddata("Score", tempData);
+                } 
+*/

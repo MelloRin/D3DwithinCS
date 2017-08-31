@@ -39,7 +39,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AES256_manager.cs" />
-    <Compile Include="Data.cs" />
     <Compile Include="DataSet.cs" />
     <Compile Include="File_manager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

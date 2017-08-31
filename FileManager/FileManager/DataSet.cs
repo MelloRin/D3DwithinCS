@@ -1,13 +1,27 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 
 namespace FileManager
 {
     public class DataSet
     {
-        private Dictionary<string, Data> dataSet = new Dictionary<string, Data>();
+        private Dictionary<string, Hashtable> dataSet = new Dictionary<string, Hashtable>();
 
-        public Data getdata(string key) => dataSet[key];
-        public void adddata(string key, Data data) => dataSet.Add(key, data);
-        public Dictionary<string, Data>.KeyCollection getdataKey() => dataSet.Keys;
+        public Hashtable getdata(string key)
+        {
+            try
+            {
+                return dataSet[key];
+            }
+            catch (KeyNotFoundException)
+            {
+                throw new DatasetException();
+            }
+        }
+
+        public void adddata(string key, Hashtable data) => dataSet.Add(key, data);
+
+        public Dictionary<string, Hashtable>.KeyCollection getdataKey() => dataSet.Keys;
+
     }
 }

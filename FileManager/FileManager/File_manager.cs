@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.IO;
 
 namespace FileManager
@@ -24,7 +25,7 @@ namespace FileManager
                 string tag = null;
 
                 dataSet = new DataSet();
-                Data data = null;
+                Hashtable data = null;
 
                 for (int i = 0; i < line.Length; i++)
                 {
@@ -33,11 +34,11 @@ namespace FileManager
                     if (nowLine.StartsWith("[") && nowLine.EndsWith("]"))
                     {
                         if (data == null)
-                            data = new Data();
+                            data = new Hashtable();
                         else
                         {
                             dataSet.adddata(tag, data);
-                            data = new Data();
+                            data = new Hashtable();
                         }
 
                         tag = nowLine.Substring(1, nowLine.Length - 2);
@@ -48,7 +49,7 @@ namespace FileManager
                     {
                         string[] temp = nowLine.Split('=');
 
-                        data.adddata(temp[0], temp[1]);
+                        data.Add(temp[0], temp[1]);
                     }
                     catch (IndexOutOfRangeException) { }
                 }
@@ -84,14 +85,13 @@ namespace FileManager
             foreach (string tag_key in dataSet.getdataKey())
             {
                 raw_data += String.Format("[{0}]\n",tag_key);
-                Data data = dataSet.getdata(tag_key);
+                Hashtable data = dataSet.getdata(tag_key);
 
-                foreach(object key in data.getKey)
+                foreach(object key in data.Keys)
                 {
-                    raw_data += String.Format("{0}={1}\n", key,data.getdata(key.ToString()));
+                    raw_data += String.Format("{0}={1}\n", key,data[key.ToString()]);
                 }
             }
-
             string output = String.Format("{0}{1}", uuid, AES256_manager.encrypt(raw_data, uuid));
 
             StreamWriter writer = new StreamWriter(saveFile_name);
@@ -101,4 +101,6 @@ namespace FileManager
             return true;
         }
     }
+
+    public class DatasetException : Exception { }
 }

@@ -1,8 +1,7 @@
-﻿using System;
+﻿using FileManager;
+using System;
 using System.Threading;
 using System.Windows.Forms;
-
-using FileManager;
 
 namespace CSd3d.Lib
 {
@@ -40,17 +39,13 @@ namespace CSd3d.Lib
 
             Thread _TmainThread = new Thread(() =>
             {
+                File_manager.load_data(out DataSet dataSet);
 
-                if (File_manager.load_data(out PublicData_manager.dataSet))
-                {
-                    //_Tsetdata.Start();
-                    
-                    PublicData_manager.settings.setSetting(PublicData_manager.dataSet);
-                    PublicData_manager.score.setScore(PublicData_manager.dataSet);
+                PublicData_manager.settings = new Setting_manager(dataSet);
+                PublicData_manager.score = new Savedata_manager(dataSet);
 
-                    mainForm = new MainForm();
-                    d3dHandler = new D3D_handler();
-                }
+                mainForm = new MainForm();
+                d3dHandler = new D3D_handler();
                 if (d3dHandler.InitallizeApplication(mainForm))
                 {
                     mainForm.windowsize_adjust();

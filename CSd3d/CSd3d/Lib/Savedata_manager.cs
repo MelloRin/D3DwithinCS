@@ -1,33 +1,28 @@
-﻿using System.Collections;
-using FileManager;
-using System.Collections.Generic;
+﻿using FileManager;
+using System.Collections;
 
 namespace CSd3d.Lib
 {
     public class Savedata_manager
     {
+        private Hashtable scoreTable = new Hashtable();
+        public Hashtable getScoretable() => scoreTable;
+
         public static readonly string[] music_name = new string[] { "a", "b", "c" };
 
-        private Hashtable scoreTable = new Hashtable();
-
-        public bool setScore(DataSet dataSet)
+        public Savedata_manager(DataSet dataSet)
         {
             try
             {
-                scoreTable = dataSet.getdata("Score").hashtable;
+                scoreTable = dataSet.getdata("Score");
             }
-            catch (KeyNotFoundException e)
+            catch (DatasetException)
             {
-
                 for (int i = 0; i < music_name.Length; i++)
                 {
-
                     scoreTable.Add(music_name[i], 0);
-
                 }
             }
-
-            return true;
         }
 
         public bool updateScore(string music_key, int score)
@@ -39,7 +34,5 @@ namespace CSd3d.Lib
 
             return true;
         }
-
-        public Hashtable getScoretable() => scoreTable;
     }
 }

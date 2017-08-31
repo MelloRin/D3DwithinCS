@@ -1,35 +1,34 @@
-﻿using System.Collections;
-using FileManager;
-using System.Collections.Generic;
+﻿using FileManager;
+using System.Collections;
 
 namespace CSd3d.Lib
 {
     public class Setting_manager
     {
         private Hashtable settings = new Hashtable();
-        private Hashtable input_keys = new Hashtable();
+        private Hashtable inputKeys = new Hashtable();
+
+        public Hashtable getDisplaytable() => settings;
+        public Hashtable getKeytable() => inputKeys;
 
         public static readonly string[] settings_key = new string[] { "width", "height", "windowded" };
         public static readonly string[] input_keys_key = new string[] { "up", "down", "left", "right" };
 
-        public bool setSetting(DataSet dataSet)
+        public Setting_manager(DataSet dataSet)
         {
             try
             {
-                if (dataSet.getdata("Display").hashtable.ContainsKey(settings_key[0]))
-                {
-                    settings = PublicData_manager.dataSet.getdata("Display").hashtable;
-                    input_keys = PublicData_manager.dataSet.getdata("Input").hashtable;
-                }
+                settings = dataSet.getdata("Display");
+                inputKeys = dataSet.getdata("Input");
             }
-            catch(KeyNotFoundException e)
+            catch (DatasetException)
             {
                 set_default_settings();
             }
-            return true;
         }
 
-        public void config_setting(string key, string value)
+        public string get_setting(string key) => settings[key].ToString();
+        public void configSetting(string key, string value)
         {
             if (settings.ContainsKey(key))
             {
@@ -37,23 +36,15 @@ namespace CSd3d.Lib
             }
         }
 
-        public void config_input_keys(string key, string value)
+        public string get_input_keys(string key) => inputKeys[key].ToString();
+        public bool input_key_search(string value) => inputKeys.ContainsValue(value);
+        public void configInputKeys(string key, string value)
         {
-            if (input_keys.ContainsKey(key))
+            if (inputKeys.ContainsKey(key))
             {
-                input_keys[key] = value;
+                inputKeys[key] = value;
             }
         }
-
-        public Hashtable getDisplaytable() => settings;
-
-        public Hashtable getKeytable() => input_keys;
-
-        public string get_setting(string key) => settings[key].ToString();
-
-        public string get_input_keys(string key) => input_keys[key].ToString();
-
-        public bool input_key_search(string value) => input_keys.ContainsValue(value);
 
         private void set_default_settings()
         {
@@ -61,10 +52,10 @@ namespace CSd3d.Lib
             settings.Add("height", "480");
             settings.Add("windowded", "true");
 
-            input_keys.Add("up", "w");
-            input_keys.Add("down", "s");
-            input_keys.Add("left", "a");
-            input_keys.Add("right", "d");
+            inputKeys.Add("up", "w");
+            inputKeys.Add("down", "s");
+            inputKeys.Add("left", "a");
+            inputKeys.Add("right", "d");
         }
     }
 }

@@ -19,8 +19,8 @@ namespace CSd3d
 
             string[] temp = comboBox1.Items[comboBox1.SelectedIndex].ToString().Split('*');
 
-            PublicData_manager.settings.config_setting("width", temp[0]);
-            PublicData_manager.settings.config_setting("height", temp[1]);
+            PublicData_manager.settings.configSetting("width", temp[0]);
+            PublicData_manager.settings.configSetting("height", temp[1]);
 
             parent_form.Invoke(new MethodInvoker(delegate ()
             {

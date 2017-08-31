@@ -29,9 +29,8 @@ namespace CSd3d.Lib
                 Console.WriteLine("HW렌더링");
 
             }
-            catch (DirectXException dxeHW)
+            catch (DirectXException)
             {
-                Console.WriteLine(dxeHW);//sw렌더링
                 try
                 {
                     this.device = new Device(0, DeviceType.Reference, mainForm.Handle,
@@ -39,10 +38,7 @@ namespace CSd3d.Lib
                     PublicData_manager.device_created = true;
                     Console.WriteLine("SW렌더링");
                 }
-                catch (DirectXException dxeSW)
-                {
-                    Console.WriteLine(dxeSW);
-                }
+                catch (DirectXException) { }
             }
             return true;
         }
