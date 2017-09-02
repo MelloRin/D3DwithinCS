@@ -20,7 +20,7 @@ namespace CSd3d.Lib
             {
                 for (int i = 0; i < music_name.Length; i++)
                 {
-                    scoreTable.Add(music_name[i], 0);
+                    scoreTable.Add(music_name[i], i);
                 }
             }
         }

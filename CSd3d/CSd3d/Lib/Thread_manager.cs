@@ -19,23 +19,10 @@ namespace CSd3d.Lib
                     d3dHandler.loop();
                     Thread.Sleep(2);
                 }
+
+				d3dHandler.Dispose();
             });
 
-            /*Thread _Tsetdata = new Thread(() =>
-            {
-                if (File_manager.load_data(out PublicData_manager.dataSet))
-                {
-                    new Thread(() =>
-                    {
-                        PublicData_manager.settings.setSetting(PublicData_manager.dataSet);
-                    }).Start();
-
-                    new Thread(() =>
-                    {
-                        PublicData_manager.score.setScore(PublicData_manager.dataSet);
-                    }).Start();
-                }
-            });*/
 
             Thread _TmainThread = new Thread(() =>
             {
@@ -67,13 +54,29 @@ namespace CSd3d.Lib
                     Thread.Sleep(2);
                 }
             });
+            _TmainThread.Start();
 
             /*if (File_manager.load_data(out PublicData_manager.dataSet))
             {
                 _Tsetdata.Start();
                 
             }*/
-            _TmainThread.Start();
+
+            /*Thread _Tsetdata = new Thread(() =>
+            {
+                if (File_manager.load_data(out PublicData_manager.dataSet))
+                {
+                    new Thread(() =>
+                    {
+                        PublicData_manager.settings.setSetting(PublicData_manager.dataSet);
+                    }).Start();
+
+                    new Thread(() =>
+                    {
+                        PublicData_manager.score.setScore(PublicData_manager.dataSet);
+                    }).Start();
+                }
+            });*/
         }
     }
 }

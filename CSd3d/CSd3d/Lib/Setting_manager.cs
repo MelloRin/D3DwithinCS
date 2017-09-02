@@ -1,4 +1,5 @@
 ﻿using FileManager;
+using System;
 using System.Collections;
 
 namespace CSd3d.Lib
@@ -32,6 +33,7 @@ namespace CSd3d.Lib
         {
             if (settings.ContainsKey(key))
             {
+				Console.WriteLine("초기세팅");
                 settings[key] = value;
             }
         }
@@ -48,8 +50,8 @@ namespace CSd3d.Lib
 
         private void set_default_settings()
         {
-            settings.Add("width", "640");
-            settings.Add("height", "480");
+            settings.Add("width", "1280");
+            settings.Add("height", "720");
             settings.Add("windowded", "true");
 
             inputKeys.Add("up", "w");

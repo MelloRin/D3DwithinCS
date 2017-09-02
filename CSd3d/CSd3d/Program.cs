@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Net;
+using System.Net.Sockets;
+using System.Text;
 
 namespace CSd3d
 {
@@ -7,6 +10,7 @@ namespace CSd3d
         /// <summary>
         /// 해당 응용 프로그램의 주 진입점입니다.
         /// </summary>
+
         [STAThread]
         static void Main(string[] args)
         {
@@ -14,6 +18,25 @@ namespace CSd3d
             Application.SetCompatibleTextRenderingDefault(false);*/
 
             new Lib.Thread_manager();
+        }
+
+        static void sendToServer(string senddata)
+        {
+            Socket sck;
+            sck = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            IPEndPoint localEndPoint = new IPEndPoint(IPAddress.Parse("Server"), 3939);
+
+            try
+            {
+                sck.Connect(localEndPoint);
+            }
+            catch
+            {
+            }
+
+            byte[] data = Encoding.UTF8.GetBytes(senddata);
+            sck.Send(data);
+            sck.Close();
         }
     }
 }

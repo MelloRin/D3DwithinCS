@@ -1,6 +1,6 @@
-﻿namespace CSd3d
+﻿namespace Setting
 {
-    partial class MainForm
+    partial class Form1
     {
         /// <summary>
         /// 필수 디자이너 변수입니다.
@@ -30,14 +30,14 @@
         {
             this.SuspendLayout();
             // 
-            // MainForm
+            // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(258, 262);
+            this.ClientSize = new System.Drawing.Size(220, 257);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
-            this.Name = "MainForm";
-            this.Text = "C# D3D";
+            this.Name = "Form1";
+            this.Text = "Form1";
             this.ResumeLayout(false);
 
         }

@@ -22,6 +22,5 @@ namespace FileManager
         public void adddata(string key, Hashtable data) => dataSet.Add(key, data);
 
         public Dictionary<string, Hashtable>.KeyCollection getdataKey() => dataSet.Keys;
-
     }
 }
