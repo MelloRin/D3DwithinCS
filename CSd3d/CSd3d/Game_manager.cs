@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CSd3d
+namespace MelloRin.CSd3d
 {
     class Game_manager
     {

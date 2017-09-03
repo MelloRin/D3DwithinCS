@@ -1,7 +1,7 @@
-﻿using FileManager;
+﻿using MelloRin.FileManager;
 using System.Collections;
 
-namespace CSd3d.Lib
+namespace MelloRin.CSd3d.Lib
 {
     public class Savedata_manager
     {
@@ -18,9 +18,9 @@ namespace CSd3d.Lib
             }
             catch (DatasetException)
             {
-                for (int i = 0; i < music_name.Length; i++)
+				for (int i = 0; i < music_name.Length; i++) 
                 {
-                    scoreTable.Add(music_name[i], i);
+					scoreTable.Add(music_name[i], i);
                 }
             }
         }

@@ -1,82 +1,88 @@
-﻿using FileManager;
+﻿using MelloRin.FileManager;
+using SharpDX.Windows;
+using SharpDX.XInput;
 using System;
+using System.Diagnostics;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace CSd3d.Lib
+using DataSet = MelloRin.FileManager.DataSet;
+
+namespace MelloRin.CSd3d.Lib
 {
-    class Thread_manager
-    {
-        public Thread_manager()
-        {
-            MainForm mainForm = null;// = new MainForm();
-            D3D_handler d3dHandler = null;//new D3D_handler();
+	class Thread_manager
+	{
+		public Thread_manager()
+		{
+			D3D_handler device = null;
+			RenderForm mainForm = null;
 
-            Thread _Td3d = new Thread(() =>
-            {
-                while (mainForm.Created)
-                {
-                    d3dHandler.loop();
-                    Thread.Sleep(2);
-                }
+			Stopwatch sw = new Stopwatch();
 
-				d3dHandler.Dispose();
-            });
+			sw.Start();
 
+			Thread _Td3d = new Thread(() =>
+			{
+				while (mainForm.Created)
+				{
+					device.loop();
+					Thread.Sleep(1000);
+				}
 
-            Thread _TmainThread = new Thread(() =>
-            {
-                File_manager.load_data(out DataSet dataSet);
+				device.Dispose();
+			});
 
-                PublicData_manager.settings = new Setting_manager(dataSet);
-                PublicData_manager.score = new Savedata_manager(dataSet);
+			Thread _TmainThread = new Thread(() =>
+			{
+				mainForm = new MainForm();
+				device = new D3D_handler(mainForm);
 
-                mainForm = new MainForm();
-                d3dHandler = new D3D_handler();
-                if (d3dHandler.InitallizeApplication(mainForm))
-                {
-                    mainForm.windowsize_adjust();
-                    mainForm.Show();
+				sw.Stop();
+				Console.WriteLine(sw.ElapsedMilliseconds);
 
-                    Console.WriteLine(PublicData_manager.settings.get_setting("width") + "*" + PublicData_manager.settings.get_setting("height"));
-                    Console.WriteLine(PublicData_manager.settings.get_input_keys("up"));
-                    Console.WriteLine(PublicData_manager.settings.get_input_keys("down"));
-                    Console.WriteLine(PublicData_manager.settings.get_input_keys("left"));
-                    Console.WriteLine(PublicData_manager.settings.get_input_keys("right"));
-                    _Td3d.Start();
-                }
-                else
-                    MessageBox.Show("초기화 에러");
+				Console.WriteLine(PublicData_manager.settings.get_setting("width") + "*" + PublicData_manager.settings.get_setting("height"));
+				Console.WriteLine(PublicData_manager.settings.get_input_keys("up"));
+				Console.WriteLine(PublicData_manager.settings.get_input_keys("down"));
+				Console.WriteLine(PublicData_manager.settings.get_input_keys("left"));
+				Console.WriteLine(PublicData_manager.settings.get_input_keys("right"));
+				_Td3d.Start();
 
-                while (mainForm.Created)
-                {
-                    Application.DoEvents();
-                    Thread.Sleep(2);
-                }
-            });
-            _TmainThread.Start();
+				Controller con = new Controller(UserIndex.One);
 
-            /*if (File_manager.load_data(out PublicData_manager.dataSet))
-            {
-                _Tsetdata.Start();
-                
-            }*/
+				while (mainForm.Created)
+				{
+					Application.DoEvents();
+					Thread.Sleep(2);
 
-            /*Thread _Tsetdata = new Thread(() =>
-            {
-                if (File_manager.load_data(out PublicData_manager.dataSet))
-                {
-                    new Thread(() =>
-                    {
-                        PublicData_manager.settings.setSetting(PublicData_manager.dataSet);
-                    }).Start();
+					if (con.IsConnected)
+					{
+						Gamepad pad = con.GetState().Gamepad;
 
-                    new Thread(() =>
-                    {
-                        PublicData_manager.score.setScore(PublicData_manager.dataSet);
-                    }).Start();
-                }
-            });*/
-        }
-    }
+						if (pad.Buttons.Equals(GamepadButtonFlags.A))
+						{
+							Console.WriteLine("(A)");
+						}
+						if (pad.Buttons.Equals(GamepadButtonFlags.B))
+						{
+							Console.WriteLine("(B)");
+						}
+					}
+				}
+			});
+
+			Thread _Tloaddata = new Thread(() =>
+			{
+				File_manager.load_data(out DataSet dataSet);
+
+				Parallel.Invoke
+				(
+					() => { PublicData_manager.settings = new Setting_manager(dataSet); },
+					() => { PublicData_manager.score = new Savedata_manager(dataSet); }
+				);
+				_TmainThread.Start();
+			});
+			_Tloaddata.Start();
+		}
+	}
 }

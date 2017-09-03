@@ -1,8 +1,8 @@
-﻿using FileManager;
+﻿using MelloRin.FileManager;
 using System;
 using System.Collections;
 
-namespace CSd3d.Lib
+namespace MelloRin.CSd3d.Lib
 {
     public class Setting_manager
     {

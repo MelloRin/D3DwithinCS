@@ -2,7 +2,7 @@
 using System.Collections;
 using System.IO;
 
-namespace FileManager
+namespace MelloRin.FileManager
 {
 	public class File_manager
 	{
