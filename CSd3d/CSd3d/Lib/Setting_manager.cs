@@ -4,7 +4,7 @@ using System.Collections;
 
 namespace MelloRin.CSd3d.Lib
 {
-    public class Setting_manager
+    public class Setting_manager : task
     {
         private Hashtable settings = new Hashtable();
         private Hashtable inputKeys = new Hashtable();
@@ -59,5 +59,10 @@ namespace MelloRin.CSd3d.Lib
             inputKeys.Add("left", "a");
             inputKeys.Add("right", "d");
         }
-    }
+
+		public bool run()
+		{
+			throw new NotImplementedException();
+		}
+	}
 }

@@ -69,6 +69,7 @@
     <Compile Include="Lib\PublicData_manager.cs" />
     <Compile Include="Lib\Savedata_manager.cs" />
     <Compile Include="Lib\Setting_manager.cs" />
+    <Compile Include="Lib\TaskQueue.cs" />
     <Compile Include="Lib\Thread_manager.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>

@@ -6,7 +6,6 @@ using SharpDX.DXGI;
 using SharpDX.Mathematics.Interop;
 using SharpDX.Windows;
 using System;
-using System.Drawing;
 using Device = SharpDX.Direct3D11.Device;
 
 namespace MelloRin.CSd3d

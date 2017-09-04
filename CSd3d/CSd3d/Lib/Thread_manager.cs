@@ -13,10 +13,14 @@ namespace MelloRin.CSd3d.Lib
 {
 	class Thread_manager
 	{
+		TaskQueue<task> currentTaskQueue = new TaskQueue<task>(2);
+
 		public Thread_manager()
 		{
 			D3D_handler device = null;
 			RenderForm mainForm = null;
+
+			taskList.
 
 			Stopwatch sw = new Stopwatch();
 
