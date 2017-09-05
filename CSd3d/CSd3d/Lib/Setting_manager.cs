@@ -4,7 +4,7 @@ using System.Collections;
 
 namespace MelloRin.CSd3d.Lib
 {
-    public class Setting_manager : task
+    public class Setting_manager
     {
         private Hashtable settings = new Hashtable();
         private Hashtable inputKeys = new Hashtable();

@@ -6,11 +6,12 @@ using SharpDX.DXGI;
 using SharpDX.Mathematics.Interop;
 using SharpDX.Windows;
 using System;
+using System.Threading;
 using Device = SharpDX.Direct3D11.Device;
 
 namespace MelloRin.CSd3d
 {
-	class D3D_handler : IDisposable
+	class D3D_handler : IDisposable, Itask
 	{
 		private RenderForm targetForm;
 
@@ -28,8 +29,33 @@ namespace MelloRin.CSd3d
 			targetForm = mainForm;
 
 			createDevice(mainForm);
+		}
 
-			mainForm.Show();
+		public bool run(Itask nowTask)
+		{
+			Thread _Td3d = new Thread(() =>
+			{
+				PublicData_manager.sw.Start();
+
+				while (targetForm.Created)
+				{
+					++PublicData_manager.frame;
+					loop();
+
+					if (PublicData_manager.sw.ElapsedMilliseconds >= 1000)
+					{
+						Console.WriteLine("{0}ms {1}fps", PublicData_manager.sw.ElapsedMilliseconds, PublicData_manager.frame);
+						PublicData_manager.sw.Restart();
+						PublicData_manager.frame = 0;
+					}
+					Thread.Sleep(10);
+				}
+				Dispose();
+			});
+
+			_Td3d.Start();
+
+			return true;
 		}
 
 		private void createDevice(RenderForm mainForm)

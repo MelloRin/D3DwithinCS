@@ -1,68 +1,28 @@
 ﻿using System;
-using System.Threading;
-
-using DataSet = MelloRin.FileManager.DataSet;
 
 namespace MelloRin.CSd3d.Lib
 {
-	interface task
+	public interface Itask
 	{
-		bool run();
+		bool run(Itask nextTask = null);
 	}
 
-	class TaskDataSet
+	public class TaskQueue
 	{
-		DataSet dataSet;
+		private QueueData head = null;
+		public uint taskInterval { get; }
 
+		public QueueData getHead => head;
 
-
-	}
-	
-	class TaskDataSetBuilder
-	{
-
-		public void addDataSet(DataSet dataSet) => this.dataSet = dataSet;
-
-		public TaskDataSet getTaskDataSet() => new TaskDataSet()
-	}
-
-
-	class TaskQueue<E> : task
-	{
-		private QueueData<E> head = null;
-		private uint taskInterval;
-		
 		public TaskQueue(uint interval = 5)
 		{
 			taskInterval = interval;
 		}
 
-		private void mainLoop()
-		{
-			while(true)
-			{
-				if(head != null)
-				{
-					((task)getTesk()).run();
-				}
-
-				Thread.Sleep((int)taskInterval);
-			}
-		}
-
-		public bool run()
-		{
-			Thread _TmainThread = new Thread(mainLoop);
-
-			_TmainThread.Start();
-
-			return true;
-		}
-
 		public int length()
 		{
 			int count = 0;
-			QueueData<E> temp = head;
+			QueueData temp = head;
 			if (head != null)
 			{
 				count++;
@@ -75,48 +35,47 @@ namespace MelloRin.CSd3d.Lib
 			return count;
 		}
 
-		public void addTask(E data)
+		public void addTask(Itask data)
 		{
 			if (head == null)
 			{
-				head = new QueueData<E>(data);
+				head = new QueueData(data);
+
+				Itask nowTask = head.getTask();
+
+				try
+				{
+					nowTask.run(head.getNext().getTask());
+				}
+				catch(NullReferenceException)
+				{
+					nowTask.run();
+				}
+
+				head = head.getNext();
 			}
 			else
 			{
-				QueueData<E> temp = head;
+				QueueData temp = head;
 				while (temp.getNext() != null)
 				{
 					temp = temp.getNext();
 				}
-				temp.setNext(new QueueData<E>(data));
+				temp.setNext(new QueueData(data));
 			}
 		}
 
-		private E getTesk()
+		public class QueueData
 		{
-			if (head != null)
-			{
-				QueueData<E> temp = head;
-				head = head.getNext();
-				return temp.getData();
-			}
-			else
-			{
-				Console.WriteLine("no data");
-				return default(E);
-			}
-		}
+			private QueueData nextData = null;
+			private Itask task;
 
-		class QueueData<e>
-		{
-			private QueueData<e> nextData = null;
-			public e data;
+			public QueueData(Itask task) => this.task = task;
 
-			public QueueData(e data) => this.data = data;
+			public QueueData getNext() => nextData;
+			public void setNext(QueueData next) => nextData = next;
 
-			public QueueData<e> getNext() => nextData;
-			public void setNext(QueueData<e> next) => nextData = next;
-			public e getData() => data;
+			public Itask getTask() => task;
 		}
 	}
 }
