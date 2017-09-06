@@ -18,18 +18,10 @@ namespace MelloRin.CSd3d
 			KeyDown += new KeyEventHandler(_keyDown);
 		}
 
-		public bool run(Itask nowTask)
+		public bool run()
 		{
 			Thread _TmainThread = new Thread(() =>
 			{
-				Console.WriteLine(PublicData_manager.settings.get_setting("width") + "*" + PublicData_manager.settings.get_setting("height"));
-				Console.WriteLine(PublicData_manager.settings.get_input_keys("up"));
-				Console.WriteLine(PublicData_manager.settings.get_input_keys("down"));
-				Console.WriteLine(PublicData_manager.settings.get_input_keys("left"));
-				Console.WriteLine(PublicData_manager.settings.get_input_keys("right"));
-
-
-				PublicData_manager.currentTaskQueue.addTask(new D3D_handler(this));
 				Show();
 				while (Created)
 				{
@@ -39,6 +31,8 @@ namespace MelloRin.CSd3d
 			});
 
 			_TmainThread.Start();
+
+			PublicData_manager.currentTaskQueue.runNext();
 
 			return true;
 		}

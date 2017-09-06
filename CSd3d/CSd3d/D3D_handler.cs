@@ -7,6 +7,7 @@ using SharpDX.Mathematics.Interop;
 using SharpDX.Windows;
 using System;
 using System.Threading;
+using System.Windows.Forms;
 using Device = SharpDX.Direct3D11.Device;
 
 namespace MelloRin.CSd3d
@@ -21,33 +22,33 @@ namespace MelloRin.CSd3d
 		private DepthStencilView _zbufferView;
 		private DeviceContext _deviceContext;
 
+		private SwapChainDescription desc;
+
 		private bool b_up = true;
 		private int B = 1;
 
 		public D3D_handler(RenderForm mainForm)
 		{
 			targetForm = mainForm;
-
-			createDevice(mainForm);
 		}
 
-		public bool run(Itask nowTask)
+		public bool run()
 		{
+			createDevice();
 			Thread _Td3d = new Thread(() =>
 			{
-				PublicData_manager.sw.Start();
+				//PublicData_manager.sw.Start();
 
 				while (targetForm.Created)
 				{
-					++PublicData_manager.frame;
-					loop();
-
+					/*++PublicData_manager.frame;
 					if (PublicData_manager.sw.ElapsedMilliseconds >= 1000)
 					{
 						Console.WriteLine("{0}ms {1}fps", PublicData_manager.sw.ElapsedMilliseconds, PublicData_manager.frame);
 						PublicData_manager.sw.Restart();
 						PublicData_manager.frame = 0;
-					}
+					}*/
+					loop();
 					Thread.Sleep(10);
 				}
 				Dispose();
@@ -55,21 +56,26 @@ namespace MelloRin.CSd3d
 
 			_Td3d.Start();
 
+			PublicData_manager.currentTaskQueue.runNext();
+
 			return true;
 		}
 
-		private void createDevice(RenderForm mainForm)
+		private void createDevice()
 		{
-			var desc = new SwapChainDescription()
+			targetForm.Invoke(new MethodInvoker(delegate ()
 			{
-				BufferCount = 1,//buffer count
-				ModeDescription = new ModeDescription(targetForm.ClientSize.Width, targetForm.ClientSize.Height, new Rational(60, 1), Format.R8G8B8A8_UNorm),//sview
-				IsWindowed = Boolean.Parse(PublicData_manager.settings.get_setting("windowded")),
-				OutputHandle = targetForm.Handle,
-				SampleDescription = new SampleDescription(1, 0),
-				SwapEffect = SwapEffect.Discard,
-				Usage = Usage.RenderTargetOutput
-			};
+				desc = new SwapChainDescription()
+				{
+					BufferCount = 1,//buffer count
+					ModeDescription = new ModeDescription(targetForm.ClientSize.Width, targetForm.ClientSize.Height, new Rational(60, 1), Format.R8G8B8A8_UNorm),//sview
+					IsWindowed = Boolean.Parse(PublicData_manager.settings.get_setting("windowded")),
+					OutputHandle = targetForm.Handle,
+					SampleDescription = new SampleDescription(1, 0),
+					SwapEffect = SwapEffect.Discard,
+					Usage = Usage.RenderTargetOutput
+				};
+			}));
 
 			FeatureLevel[] levels = new FeatureLevel[] { FeatureLevel.Level_11_0 };
 
@@ -97,8 +103,8 @@ namespace MelloRin.CSd3d
 				Format = Format.D16_UNorm,
 				ArraySize = 1,
 				MipLevels = 1,
-				Width = targetForm.ClientSize.Width,
-				Height = targetForm.ClientSize.Height,
+				Width = Int32.Parse(PublicData_manager.settings.get_setting("width")),
+				Height = Int32.Parse(PublicData_manager.settings.get_setting("height")),
 				SampleDescription = new SampleDescription(1, 0),
 				Usage = ResourceUsage.Default,
 				BindFlags = BindFlags.DepthStencil,

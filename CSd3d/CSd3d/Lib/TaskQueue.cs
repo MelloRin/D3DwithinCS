@@ -1,58 +1,39 @@
-﻿using System;
-
-namespace MelloRin.CSd3d.Lib
+﻿namespace MelloRin.CSd3d.Lib
 {
 	public interface Itask
 	{
-		bool run(Itask nextTask = null);
+		bool run();
 	}
 
 	public class TaskQueue
 	{
 		private QueueData head = null;
-		public uint taskInterval { get; }
-
 		public QueueData getHead => head;
+
+		private bool running = false;
+
+		public uint taskInterval { get; }
 
 		public TaskQueue(uint interval = 5)
 		{
 			taskInterval = interval;
 		}
 
-		public int length()
-		{
-			int count = 0;
-			QueueData temp = head;
-			if (head != null)
-			{
-				count++;
-				while (temp.getNext() != null)
-				{
-					count++;
-					temp = temp.getNext();
-				}
-			}
-			return count;
-		}
-
 		public void addTask(Itask data)
 		{
 			if (head == null)
 			{
+				if (running)
+					while (!running) ;
+
+				running = true;
 				head = new QueueData(data);
 
-				Itask nowTask = head.getTask();
+				QueueData temp = head;
+				head = temp.getNext();
 
-				try
-				{
-					nowTask.run(head.getNext().getTask());
-				}
-				catch(NullReferenceException)
-				{
-					nowTask.run();
-				}
-
-				head = head.getNext();
+				temp.task.run();
+				running = false;
 			}
 			else
 			{
@@ -65,17 +46,29 @@ namespace MelloRin.CSd3d.Lib
 			}
 		}
 
+		public void runNext()
+		{
+			if (head != null)
+			{
+				running = true;
+
+				QueueData temp = head;
+				head = temp.getNext();
+
+				temp.task.run();
+				running = false;
+			}
+		}
+
 		public class QueueData
 		{
 			private QueueData nextData = null;
-			private Itask task;
+			public Itask task { get; }
 
 			public QueueData(Itask task) => this.task = task;
 
 			public QueueData getNext() => nextData;
 			public void setNext(QueueData next) => nextData = next;
-
-			public Itask getTask() => task;
 		}
 	}
 }

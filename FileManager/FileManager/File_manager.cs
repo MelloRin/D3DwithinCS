@@ -6,7 +6,7 @@ namespace MelloRin.FileManager
 {
 	public class File_manager
 	{
-		public static readonly string saveFile_name = "savedata.mlr";
+		private static readonly string saveFile_name = "savedata.mlr";
 		private DataSet dataSet = new DataSet();
 
 		public static bool load_data(out DataSet dataSet)
@@ -27,7 +27,7 @@ namespace MelloRin.FileManager
 				dataSet = new DataSet();
 				Hashtable data = null;
 
-				for (int i = 0; i < line.Length-2; i++)
+				for (int i = 0; i < line.Length - 2; i++)
 				{
 					string nowLine = line[i];
 
@@ -94,7 +94,7 @@ namespace MelloRin.FileManager
 			string output = String.Format("{0}{1}", uuid, AES256_manager.encrypt(raw_data, uuid));
 
 			StreamWriter writer = new StreamWriter(saveFile_name);
-			writer.WriteLine(output);
+			writer.Write(output);
 			writer.Close();
 
 			return true;
