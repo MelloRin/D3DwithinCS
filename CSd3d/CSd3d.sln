@@ -1,11 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26430.12
+VisualStudioVersion = 15.0.26730.12
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSd3d", "CSd3d\CSd3d.csproj", "{18CDBE09-EB8E-4F42-AD89-49B2B1D780A1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileManager", "..\FileManager\FileManager\FileManager.csproj", "{41E69564-6015-43BF-A8AA-AB9C10CDAA55}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "server", "..\server\server\server.csproj", "{F42951DD-AE66-49AB-B5F2-59EE8FAF4B21}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,11 +23,15 @@ Global
 		{41E69564-6015-43BF-A8AA-AB9C10CDAA55}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{41E69564-6015-43BF-A8AA-AB9C10CDAA55}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{41E69564-6015-43BF-A8AA-AB9C10CDAA55}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F42951DD-AE66-49AB-B5F2-59EE8FAF4B21}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F42951DD-AE66-49AB-B5F2-59EE8FAF4B21}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F42951DD-AE66-49AB-B5F2-59EE8FAF4B21}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F42951DD-AE66-49AB-B5F2-59EE8FAF4B21}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {7281C909-0AB6-441F-8642-43C488EB8E97}
+		SolutionGuid = {35F82D27-37E5-4424-B1CA-280128FC0C30}
 	EndGlobalSection
 EndGlobal

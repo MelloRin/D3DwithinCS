@@ -18,7 +18,7 @@ namespace MelloRin.CSd3d
 			KeyDown += new KeyEventHandler(_keyDown);
 		}
 
-		public bool run()
+		public void run()
 		{
 			Thread _TmainThread = new Thread(() =>
 			{
@@ -33,8 +33,6 @@ namespace MelloRin.CSd3d
 			_TmainThread.Start();
 
 			PublicData_manager.currentTaskQueue.runNext();
-
-			return true;
 		}
 
 		public void windowsize_adjust()
@@ -70,7 +68,6 @@ namespace MelloRin.CSd3d
 					Console.WriteLine("(RIGHT)key DOWN");
 			}
 		}
-
 
 		private void _formClosed(object sender, FormClosedEventArgs e)
 		{

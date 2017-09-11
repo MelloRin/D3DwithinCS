@@ -24,32 +24,54 @@ namespace MelloRin.CSd3d
 
 		private SwapChainDescription desc;
 
-		private bool b_up = true;
-		private int B = 1;
+		private readonly int targetFPS = 60;
+		
+		private bool b_up = false;
+		private float B = 0f;
 
 		public D3D_handler(RenderForm mainForm)
 		{
 			targetForm = mainForm;
 		}
 
-		public bool run()
+		public void run()
 		{
 			createDevice();
 			Thread _Td3d = new Thread(() =>
 			{
-				//PublicData_manager.sw.Start();
+				PublicData_manager.sw.Start();
+				int lastFrameTime = DateTime.Now.Millisecond;
+				int msPerFPS = 1000 / targetFPS;
 
 				while (targetForm.Created)
 				{
-					/*++PublicData_manager.frame;
+					int currentFrameTime = DateTime.Now.Millisecond;
+					int renderTime;
+
+					loop();
+
+					if (lastFrameTime > currentFrameTime)
+					{
+						renderTime = (currentFrameTime + 1000) - lastFrameTime;
+					}
+					else
+					{
+						renderTime = currentFrameTime - lastFrameTime;
+					}
+					if (renderTime < msPerFPS)
+					{
+						Thread.Sleep((int)((msPerFPS - renderTime) * 2.1));
+					}
+					lastFrameTime = currentFrameTime;
+
+					++PublicData_manager.frame;
+
 					if (PublicData_manager.sw.ElapsedMilliseconds >= 1000)
 					{
 						Console.WriteLine("{0}ms {1}fps", PublicData_manager.sw.ElapsedMilliseconds, PublicData_manager.frame);
 						PublicData_manager.sw.Restart();
 						PublicData_manager.frame = 0;
-					}*/
-					loop();
-					Thread.Sleep(10);
+					}
 				}
 				Dispose();
 			});
@@ -57,8 +79,6 @@ namespace MelloRin.CSd3d
 			_Td3d.Start();
 
 			PublicData_manager.currentTaskQueue.runNext();
-
-			return true;
 		}
 
 		private void createDevice()
@@ -161,36 +181,27 @@ namespace MelloRin.CSd3d
 		}
 
 		private void background_Render()
-		{
-			//RawColor4 color = new RawColor4(0, 0, 1, 1);
-
-			Clear( b_up ? new RawColor4(0, 0, 1, 1) : new RawColor4(1, 0, 0, 1)) ;
-			b_up = !b_up;
-			/*
+		{			
 			if (b_up)
 			{
-				_device.Clear(ClearFlags.Target, color, 1.0f, 0);
-
-				if (B < 255)
-					B += 2;
+				if (B < 1f)
+					B += 0.005f;
 				else
 				{
-					B = 255;
 					b_up = false;
 				}
 			}
 			else
 			{
-				_device.Clear(ClearFlags.Target, color, 1.0f, 0);
-
-				if (B >= 2)
-					B -= 2;
+				if (B >= 0f)
+					B -= 0.005f;
 				else
 				{
-					B = 1;
 					b_up = true;
 				}
-			}*/
+			}
+
+			Clear(new RawColor4(0, 0, B, 1));
 		}
 
 		public void Dispose()

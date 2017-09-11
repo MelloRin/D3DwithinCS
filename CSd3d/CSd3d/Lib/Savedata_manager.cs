@@ -1,6 +1,8 @@
 ﻿using MelloRin.FileManager;
 using System.Collections;
 
+using DataSet = MelloRin.FileManager.DataSet;
+
 namespace MelloRin.CSd3d.Lib
 {
     public class Savedata_manager

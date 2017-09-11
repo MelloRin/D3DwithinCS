@@ -2,6 +2,8 @@
 using System;
 using System.Collections;
 
+using DataSet = MelloRin.FileManager.DataSet;
+
 namespace MelloRin.CSd3d.Lib
 {
     public class Setting_manager
@@ -59,10 +61,5 @@ namespace MelloRin.CSd3d.Lib
             inputKeys.Add("left", "a");
             inputKeys.Add("right", "d");
         }
-
-		public bool run()
-		{
-			throw new NotImplementedException();
-		}
 	}
 }

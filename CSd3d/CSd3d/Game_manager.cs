@@ -1,9 +1,22 @@
-﻿using System;
+﻿using MelloRin.CSd3d.Lib;
+using System;
+using System.Threading;
 
 namespace MelloRin.CSd3d
 {
-    class Game_manager
+	class Game_manager : Itask
     {
+		public void run()
+		{
+			Thread _Tgame = new Thread(() =>
+			{
+				//while(main)
+			});
+
+			_Tgame.Start();
+			PublicData_manager.currentTaskQueue.runNext();
+		}
+
 
         public void temp()
         {

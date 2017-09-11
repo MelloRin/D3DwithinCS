@@ -2,7 +2,7 @@
 {
 	public interface Itask
 	{
-		bool run();
+		void run();
 	}
 
 	public class TaskQueue
