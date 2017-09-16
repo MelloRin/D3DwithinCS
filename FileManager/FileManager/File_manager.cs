@@ -27,7 +27,7 @@ namespace MelloRin.FileManager
 				dataSet = new DataSet();
 				Hashtable data = null;
 
-				for (int i = 0; i < line.Length - 2; i++)
+				for (int i = 0; i < line.Length - 1; i++)
 				{
 					string nowLine = line[i];
 

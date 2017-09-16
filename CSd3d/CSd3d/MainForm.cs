@@ -16,6 +16,9 @@ namespace MelloRin.CSd3d
 
 			FormClosed += new FormClosedEventHandler(_formClosed);
 			KeyDown += new KeyEventHandler(_keyDown);
+			MaximizeBox = false;
+			Icon = null;
+			Text = "Test";
 		}
 
 		public void run()
