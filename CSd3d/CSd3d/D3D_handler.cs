@@ -1,18 +1,17 @@
 ﻿using MelloRin.CSd3d.Lib;
 using SharpDX;
-using SharpDX.Direct2D1;
 using SharpDX.Direct3D;
 using SharpDX.Direct3D11;
-using SharpDX.DirectWrite;
 using SharpDX.DXGI;
 using SharpDX.Mathematics.Interop;
 using SharpDX.Windows;
 using System;
-using System.IO;
 using System.Threading;
+using System.Timers;
 using System.Windows.Forms;
 
 using Device = SharpDX.Direct3D11.Device;
+using Timer = System.Timers.Timer;
 
 namespace MelloRin.CSd3d
 {
@@ -26,52 +25,62 @@ namespace MelloRin.CSd3d
 		private SwapChain _swapChain;
 		private RenderTargetView _backbufferView;
 		private DepthStencilView _zbufferView;
-		private SharpDX.Direct3D11.DeviceContext _deviceContext;
+		private DeviceContext _deviceContext;
 
 		private Texture2D _backBufferTexture;
-		D2DFont font;
+		public D2DFont font { get; private set; }
 
 		private SwapChainDescription desc;
 
 		//vsync
 		private readonly int targetFPS = 60;
 		private int lastFrameTime;
+
 		private int msPerFPS;
+		private double leftMsPerFPS;
+		private double leftMs = 0d;
+
+		private int renderTime;
+		private int sleepTime;
+
+		private int currentFrameTime;
+		private int frame = 0;
 
 		//background
 		private bool b_up = false;
 		private float B = 0f;
 
-
-		StreamWriter writer = new StreamWriter("log.txt");
-
-
-
 		public D3D_handler(RenderForm mainForm)
 		{
 			targetForm = mainForm;
+			leftMsPerFPS = 1000f / targetFPS;
+			msPerFPS = (Int32)leftMsPerFPS;
+			leftMsPerFPS -= msPerFPS;
+
+			Timer timer = new Timer();
+			timer.Interval = 1000;
+			timer.Elapsed += new ElapsedEventHandler((object sender, ElapsedEventArgs e) =>
+			{
+				Console.WriteLine("{0}fps", frame);
+				frame = 0;
+			});
+			timer.Start();
 		}
 
 		public void run()
 		{
-			msPerFPS = 1000 / targetFPS;
-
 			createDevice();
 
 			Thread _Td3d = new Thread(() =>
 			{
-				PublicData_manager.sw.Start();
-
 				while (targetForm.Created)
 				{
-					lastFrameTime = DateTime.Now.Millisecond;
 					loop();
-
 					vSync();
 				}
 				Dispose();
-				writer.Close();
 			});
+
 
 			_Td3d.Start();
 
@@ -94,7 +103,7 @@ namespace MelloRin.CSd3d
 				};
 			}));
 
-			SharpDX.Direct3D.FeatureLevel[] levels = new SharpDX.Direct3D.FeatureLevel[] { SharpDX.Direct3D.FeatureLevel.Level_11_0 };
+			FeatureLevel[] levels = new FeatureLevel[] { FeatureLevel.Level_11_0 };
 			DeviceCreationFlags flag = DeviceCreationFlags.None | DeviceCreationFlags.BgraSupport;
 
 			Device.CreateWithSwapChain(DriverType.Hardware, flag, levels, desc, out _device, out _swapChain);
@@ -133,48 +142,23 @@ namespace MelloRin.CSd3d
 			_zbufferView = new DepthStencilView(_device, _zbufferTexture);
 			_zbufferTexture.Dispose();
 
-			SetDefaultTargets();
-		}
-
-		private void Clear(RawColor4 color)
-		{
-			_deviceContext.ClearRenderTargetView(_backbufferView, color);
-			_deviceContext.ClearDepthStencilView(_zbufferView, DepthStencilClearFlags.Depth, 1.0F, 0);
-		}
-
-		private void Present()
-		{
-			_swapChain.Present(0, PresentFlags.None);
-		}
-
-		private void SetDefaultTargets()
-		{
-			_deviceContext.Rasterizer.SetViewport(0, 0, targetForm.ClientSize.Width, targetForm.ClientSize.Height);
-			_deviceContext.OutputMerger.SetTargets(_zbufferView, _backbufferView);
+			setDefaultTargets();
 		}
 
 		private void loop()
 		{
 			if (PublicData_manager.device_created)
 			{
-				++PublicData_manager.frame;
+				++frame;
 				try
 				{
+					lastFrameTime = DateTime.Now.Millisecond;
 					background_Render();
-					//Console.WriteLine("{0},{1},{2},{3}", color.A, color.R, color.G, color.B);
-
-					if (PublicData_manager.sw.ElapsedMilliseconds >= 1000)
-					{
-						Console.WriteLine("{0}ms {1}fps", PublicData_manager.sw.ElapsedMilliseconds, PublicData_manager.frame);
-						PublicData_manager.sw.Restart();
-						PublicData_manager.frame = 0;
-					}
 
 					font.Begin();
 					font.DrawString("Hello SharpDX", 0, 0);
 					font.DrawString("Current Time " + DateTime.Now.ToString(), 0, 32);
 					font.End();
-
 
 					Present();
 				}
@@ -188,11 +172,7 @@ namespace MelloRin.CSd3d
 
 		private void vSync()
 		{
-			int renderTime;
-			int sleepTime;
-
-			int currentFrameTime = DateTime.Now.Millisecond;
-
+			currentFrameTime = DateTime.Now.Millisecond;
 			if (lastFrameTime > currentFrameTime)
 			{
 				renderTime = (currentFrameTime + 1000) - lastFrameTime;
@@ -201,10 +181,16 @@ namespace MelloRin.CSd3d
 			{
 				renderTime = currentFrameTime - lastFrameTime;
 			}
+			leftMs += leftMsPerFPS;
 
-			sleepTime = msPerFPS - renderTime;
-
-			writer.WriteLine("{0} ~ {1}  {2}", lastFrameTime, currentFrameTime, sleepTime);
+			if (leftMs >= 1d)
+			{
+				int errorCorrect = (Int32)leftMs;
+				sleepTime = (msPerFPS - renderTime) + errorCorrect;
+				leftMs -= errorCorrect;
+			}
+			else
+				sleepTime = msPerFPS - renderTime;
 			if (sleepTime > 0)
 			{
 				Thread.Sleep(sleepTime);
@@ -235,72 +221,28 @@ namespace MelloRin.CSd3d
 			Clear(new RawColor4(0, 0, B, 1));
 		}
 
+
+		private void Clear(RawColor4 color)
+		{
+			_deviceContext.ClearRenderTargetView(_backbufferView, color);
+			_deviceContext.ClearDepthStencilView(_zbufferView, DepthStencilClearFlags.Depth, 1.0F, 0);
+		}
+
+		private void Present()
+		{
+			_swapChain.Present(0, PresentFlags.None);
+		}
+
+		private void setDefaultTargets()
+		{
+			_deviceContext.Rasterizer.SetViewport(0, 0, targetForm.ClientSize.Width, targetForm.ClientSize.Height);
+			_deviceContext.OutputMerger.SetTargets(_zbufferView, _backbufferView);
+		}
+
 		public void Dispose()
 		{
 			if (_device != null)
 				_device.Dispose();
-		}
-
-		class D2DFont : IDisposable
-		{
-			private TextFormat _directWriteTextFormat;
-			private SolidColorBrush _directWriteFontColor;
-			private RenderTarget _direct2DRenderTarget;
-			
-			private string _fontName = "Calibri";
-			private int _fontSize = 22;
-			private Color _fontColor = Color.White;
-
-			public D2DFont(Texture2D backBuffer)
-			{
-				var d2dFactory = new SharpDX.Direct2D1.Factory();
-				var d2dSurface = backBuffer.QueryInterface<Surface>();
-				_direct2DRenderTarget = new RenderTarget(d2dFactory, d2dSurface, new SharpDX.Direct2D1.
-					RenderTargetProperties(new PixelFormat(Format.Unknown, SharpDX.Direct2D1.AlphaMode.Premultiplied)));
-				d2dSurface.Dispose();
-				d2dFactory.Dispose();
-
-				InitFont();
-			}
-
-			public void SetFont(Color fontColor, string fontName, int fontSize)
-			{
-				_fontColor = fontColor;
-				_fontName = fontName;
-				_fontSize = fontSize;
-
-				InitFont();
-			}
-
-			private void InitFont()
-			{
-				var directWriteFactory = new SharpDX.DirectWrite.Factory();
-				_directWriteTextFormat = new TextFormat(directWriteFactory, _fontName, _fontSize) { TextAlignment = SharpDX.DirectWrite.TextAlignment.Leading, ParagraphAlignment = SharpDX.DirectWrite.ParagraphAlignment.Near };
-				_directWriteFontColor = new SolidColorBrush(_direct2DRenderTarget, _fontColor);
-				directWriteFactory.Dispose();
-			}
-
-			public void DrawString(string text, int x, int y, int width = 1280, int height = 720)
-			{
-				_direct2DRenderTarget.DrawText(text, _directWriteTextFormat, new RawRectangleF(x, y, width, height), _directWriteFontColor);
-			}
-
-			public void Dispose()
-			{
-				Utilities.Dispose(ref _directWriteTextFormat);
-				Utilities.Dispose(ref _directWriteFontColor);
-				Utilities.Dispose(ref _direct2DRenderTarget);
-			}
-
-			public void End()
-			{
-				_direct2DRenderTarget.EndDraw();
-			}
-
-			public void Begin()
-			{
-				_direct2DRenderTarget.BeginDraw();
-			}
 		}
 	}
 }

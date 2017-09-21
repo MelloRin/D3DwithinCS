@@ -3,7 +3,7 @@ using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-
+using System.Threading;
 using DataSet = System.Data.DataSet;
 
 namespace server
@@ -53,6 +53,24 @@ namespace server
 			return uuid;
 		}
 
+		static void _task(Socket sock)
+		{
+			byte[] Buffer = new byte[sock.SendBufferSize];
+			int bytesRead = sock.Receive(Buffer);
+
+			byte[] formatted = new byte[bytesRead];
+			//string echo = "";
+
+			for (int i = 0; i < bytesRead; ++i)
+			{
+				formatted[i] = Buffer[i];
+			}
+
+			string received = Encoding.UTF8.GetString(formatted);
+			Console.WriteLine(received);
+			sock.Close();
+		}
+
 		static void Main(string[] args)
 		{
 			try
@@ -60,23 +78,12 @@ namespace server
 				Socket socket = socketBinder();
 				while (true)
 				{
-					socket.Listen(100);
-
+					socket.Listen(10);
 					Socket accepted = socket.Accept();
 
-					byte[] Buffer = new byte[accepted.SendBufferSize];
-					int bytesRead = accepted.Receive(Buffer);
+					Thread _Tsocket = new Thread(() => _task(accepted));
+					_Tsocket.Start();
 
-					byte[] formatted = new byte[bytesRead];
-					//string echo = "";
-
-					for (int i = 0; i < bytesRead; ++i)
-					{
-						formatted[i] = Buffer[i];
-					}
-
-					string received = Encoding.UTF8.GetString(formatted);
-					Console.WriteLine(received);
 					/*
                     string uuid = received.Split('/')[0];
                     string token = received.Split('/')[1];
@@ -87,8 +94,10 @@ namespace server
                     byte[] send = Encoding.UTF8.GetBytes(echo);
 
                     accepted.Send(send);
+					socket.Close();
                     */
 				}
+
 			}
 			catch (Exception e)
 			{

@@ -29,7 +29,7 @@ namespace MelloRin.CSd3d
 				while (Created)
 				{
 					Application.DoEvents();
-					Thread.Sleep(2);
+					Thread.Sleep(5);
 				}
 			});
 
@@ -63,11 +63,11 @@ namespace MelloRin.CSd3d
 			{
 				if (input.Equals(PublicData_manager.settings.get_input_keys(Setting_manager.input_keys_key[0])))
 					Console.WriteLine("(UP)key DOWN");
-				else if (input.Equals(PublicData_manager.settings.get_input_keys(Setting_manager.input_keys_key[1])))
+				if (input.Equals(PublicData_manager.settings.get_input_keys(Setting_manager.input_keys_key[1])))
 					Console.WriteLine("(DOWN)key DOWN");
-				else if (input.Equals(PublicData_manager.settings.get_input_keys(Setting_manager.input_keys_key[2])))
+				if (input.Equals(PublicData_manager.settings.get_input_keys(Setting_manager.input_keys_key[2])))
 					Console.WriteLine("(LEFT)key DOWN");
-				else if (input.Equals(PublicData_manager.settings.get_input_keys(Setting_manager.input_keys_key[3])))
+				if (input.Equals(PublicData_manager.settings.get_input_keys(Setting_manager.input_keys_key[3])))
 					Console.WriteLine("(RIGHT)key DOWN");
 			}
 		}

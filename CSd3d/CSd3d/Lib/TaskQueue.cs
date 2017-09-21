@@ -8,16 +8,8 @@
 	public class TaskQueue
 	{
 		private QueueData head = null;
-		public QueueData getHead => head;
 
 		private bool running = false;
-
-		public uint taskInterval { get; }
-
-		public TaskQueue(uint interval = 5)
-		{
-			taskInterval = interval;
-		}
 
 		public void addTask(Itask data)
 		{
@@ -59,16 +51,15 @@
 				running = false;
 			}
 		}
+	}
+	internal class QueueData
+	{
+		private QueueData nextData = null;
+		public Itask task { get; }
 
-		public class QueueData
-		{
-			private QueueData nextData = null;
-			public Itask task { get; }
+		public QueueData(Itask task) => this.task = task;
 
-			public QueueData(Itask task) => this.task = task;
-
-			public QueueData getNext() => nextData;
-			public void setNext(QueueData next) => nextData = next;
-		}
+		public QueueData getNext() => nextData;
+		public void setNext(QueueData next) => nextData = next;
 	}
 }

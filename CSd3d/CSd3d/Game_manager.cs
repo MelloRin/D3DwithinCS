@@ -1,23 +1,56 @@
 ﻿using MelloRin.CSd3d.Lib;
 using System;
 using System.Threading;
+using System.Timers;
+using Timer = System.Timers.Timer;
 
 namespace MelloRin.CSd3d
 {
 	class Game_manager : Itask
 	{
 		static public bool gameRunning { get; private set; }
+		private D3D_handler drawer;
+		private Timer timer;
+		private int sec;
+
+		public Game_manager(D3D_handler drawer)
+		{
+			this.drawer = drawer;
+
+			timer = new Timer();
+			timer.Interval = 1000;
+			timer.Elapsed += _timerEvent;
+		}
+
+		private void _timerEvent(object sender, ElapsedEventArgs e)
+		{
+			Console.WriteLine("{0}sec elapsed...", ++sec);
+			/*drawer.font.Begin();
+			drawer.font.DrawString(sec.ToString(),100,100);
+			drawer.font.End();*/
+
+			if (sec > 10)
+			{
+				gameRunning = false;
+				timer.Stop();
+			}
+		}
 
 		public void run()
 		{
+			sec = 0;
 			gameRunning = true;
+			timer.Start();
 			Thread _Tgame = new Thread(() =>
 			{
-				while(gameRunning)
+				while (gameRunning)
 				{
-
+					if (!PublicData_manager.device_created)
+					{
+						gameRunning = false;
+					}
+					Thread.Sleep(1);
 				}
-				gameRunning = false;
 			});
 
 			_Tgame.Start();
