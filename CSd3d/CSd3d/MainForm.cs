@@ -12,7 +12,7 @@ namespace MelloRin.CSd3d
 	{
 		public MainForm()
 		{
-			windowsize_adjust();
+			windowsizeAdjust();
 
 			FormClosed += new FormClosedEventHandler(_formClosed);
 			KeyDown += new KeyEventHandler(_keyDown);
@@ -38,7 +38,7 @@ namespace MelloRin.CSd3d
 			PublicData_manager.currentTaskQueue.runNext();
 		}
 
-		public void windowsize_adjust()
+		public void windowsizeAdjust()
 		{
 			AutoScaleDimensions = new SizeF(7F, 12F);
 			AutoScaleMode = AutoScaleMode.Font;

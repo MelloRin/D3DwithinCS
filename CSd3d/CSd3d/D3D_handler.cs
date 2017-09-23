@@ -37,8 +37,8 @@ namespace MelloRin.CSd3d
 		private int lastFrameTime;
 
 		private int msPerFPS;
-		private double leftMsPerFPS;
-		private double leftMs = 0d;
+		/*private double leftMsPerFPS;
+		private double leftMs = 0d;*/
 
 		private int renderTime;
 		private int sleepTime;
@@ -53,9 +53,10 @@ namespace MelloRin.CSd3d
 		public D3D_handler(RenderForm mainForm)
 		{
 			targetForm = mainForm;
-			leftMsPerFPS = 1000f / targetFPS;
+			msPerFPS = 1000 / targetFPS;
+			/*leftMsPerFPS = 1000f / targetFPS;
 			msPerFPS = (Int32)leftMsPerFPS;
-			leftMsPerFPS -= msPerFPS;
+			leftMsPerFPS -= msPerFPS;*/
 
 			Timer timer = new Timer();
 			timer.Interval = 1000;
@@ -119,6 +120,10 @@ namespace MelloRin.CSd3d
 		{
 			_backBufferTexture = _swapChain.GetBackBuffer<Texture2D>(0);
 			font = new D2DFont(_backBufferTexture);
+
+			font.addTextList("tittle","Hello SharpDX", 0, 0);
+			font.addTextList("nowTime","Current Time " + DateTime.Now.ToString(), 0, 32);
+
 			_backbufferView = new RenderTargetView(_device, _backBufferTexture);
 
 			_backBufferTexture.Dispose();
@@ -137,7 +142,6 @@ namespace MelloRin.CSd3d
 				OptionFlags = ResourceOptionFlags.None
 			});
 
-
 			// Create the depth buffer view
 			_zbufferView = new DepthStencilView(_device, _zbufferTexture);
 			_zbufferTexture.Dispose();
@@ -147,27 +151,23 @@ namespace MelloRin.CSd3d
 
 		private void loop()
 		{
-			if (PublicData_manager.device_created)
+			lastFrameTime = DateTime.Now.Millisecond;
+			try
 			{
+				background_Render();
+				
+				font.drawStrings();
+
+				Present();
+
 				++frame;
-				try
-				{
-					lastFrameTime = DateTime.Now.Millisecond;
-					background_Render();
-
-					font.Begin();
-					font.DrawString("Hello SharpDX", 0, 0);
-					font.DrawString("Current Time " + DateTime.Now.ToString(), 0, 32);
-					font.End();
-
-					Present();
-				}
-				catch (SharpDXException e)
-				{
-					Console.WriteLine("D3D 에러" + e.ToString());
-					return;
-				}
 			}
+			catch (SharpDXException e)
+			{
+				Console.WriteLine("D3D 에러" + e.ToString());
+				return;
+			}
+
 		}
 
 		private void vSync()
@@ -181,7 +181,7 @@ namespace MelloRin.CSd3d
 			{
 				renderTime = currentFrameTime - lastFrameTime;
 			}
-			leftMs += leftMsPerFPS;
+			/*leftMs += leftMsPerFPS;
 
 			if (leftMs >= 1d)
 			{
@@ -189,7 +189,7 @@ namespace MelloRin.CSd3d
 				sleepTime = (msPerFPS - renderTime) + errorCorrect;
 				leftMs -= errorCorrect;
 			}
-			else
+			else*/
 				sleepTime = msPerFPS - renderTime;
 			if (sleepTime > 0)
 			{

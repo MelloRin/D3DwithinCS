@@ -8,8 +8,18 @@
 	public class TaskQueue
 	{
 		private QueueData head = null;
-
 		private bool running = false;
+
+		private class QueueData
+		{
+			private QueueData nextData = null;
+			public Itask task { get; }
+
+			public QueueData(Itask task) => this.task = task;
+
+			public QueueData getNext() => nextData;
+			public void setNext(QueueData next) => nextData = next;
+		}
 
 		public void addTask(Itask data)
 		{
@@ -51,15 +61,5 @@
 				running = false;
 			}
 		}
-	}
-	internal class QueueData
-	{
-		private QueueData nextData = null;
-		public Itask task { get; }
-
-		public QueueData(Itask task) => this.task = task;
-
-		public QueueData getNext() => nextData;
-		public void setNext(QueueData next) => nextData = next;
 	}
 }

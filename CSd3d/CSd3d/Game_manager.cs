@@ -2,6 +2,7 @@
 using System;
 using System.Threading;
 using System.Timers;
+
 using Timer = System.Timers.Timer;
 
 namespace MelloRin.CSd3d
@@ -16,6 +17,8 @@ namespace MelloRin.CSd3d
 		public Game_manager(D3D_handler drawer)
 		{
 			this.drawer = drawer;
+
+			drawer.font.addTextList("gamestate", "running", 100, 100);
 
 			timer = new Timer();
 			timer.Interval = 1000;
@@ -32,6 +35,9 @@ namespace MelloRin.CSd3d
 			if (sec > 10)
 			{
 				gameRunning = false;
+				Console.WriteLine("Timer Stoped");
+
+				drawer.font.deleteTextList("gamestate");
 				timer.Stop();
 			}
 		}

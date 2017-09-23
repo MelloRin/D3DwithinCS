@@ -22,7 +22,7 @@ namespace MelloRin.CSd3d
 			PublicData_manager.currentTaskQueue.addTask(mainForm);
 			D3D_handler drawer = new D3D_handler(mainForm);
 			PublicData_manager.currentTaskQueue.addTask(drawer);
-			//PublicData_manager.currentTaskQueue.addTask(new Game_manager(drawer));
+			PublicData_manager.currentTaskQueue.addTask(new Game_manager(drawer));
 		}
 	}
 }

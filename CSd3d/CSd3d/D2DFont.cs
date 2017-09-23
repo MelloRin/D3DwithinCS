@@ -5,10 +5,11 @@ using SharpDX.DirectWrite;
 using SharpDX.DXGI;
 using SharpDX.Mathematics.Interop;
 using System;
+using System.Collections.Generic;
 
 namespace MelloRin.CSd3d
 {
-	class D2DFont : IDisposable
+	public class D2DFont : IDisposable
 	{
 		private TextFormat _directWriteTextFormat;
 		private SolidColorBrush _directWriteFontColor;
@@ -18,6 +19,21 @@ namespace MelloRin.CSd3d
 		private string _fontName = "Calibri";
 		private int _fontSize = 22;
 
+		private Dictionary<string, FontData> drawList = new Dictionary<string, FontData>();
+
+		private class FontData
+		{
+			public string text { get; private set; }
+			public int x { get; private set; }
+			public int y { get; private set; }
+
+			public FontData(string text, int targetX = 0, int targetY = 0)
+			{
+				this.text = text;
+				x = targetX;
+				y = targetY;
+			}
+		}
 
 		public D2DFont(Texture2D backBuffer)
 		{
@@ -31,7 +47,7 @@ namespace MelloRin.CSd3d
 			InitFont();
 		}
 
-		public void SetFont(Color fontColor , string fontName = "Calibri", int fontSize = 22)
+		public void SetFont(Color fontColor, string fontName = "Calibri", int fontSize = 22)
 		{
 			_fontColor = fontColor;
 			_fontName = fontName;
@@ -49,18 +65,36 @@ namespace MelloRin.CSd3d
 			directWriteFactory.Dispose();
 		}
 
-		public void DrawString(string text, int x, int y, int width = 1280, int height = 720)
+		public void addTextList(string key, string text, int targetX = 0, int targetY = 0)
 		{
-			_direct2DRenderTarget.DrawText(text, _directWriteTextFormat, new RawRectangleF(x, y, width, height), _directWriteFontColor);
+			if (drawList.ContainsKey(key))
+			{
+				drawList[key] = new FontData(text, targetX, targetY);
+			}
+			else
+			{
+				drawList.Add(key, new FontData(text, targetX, targetY));
+			}
 		}
 
-		public void Begin()
+		public void deleteTextList(string key)
+		{
+			if (drawList.ContainsKey(key))
+			{
+				drawList.Remove(key);
+			}
+		}
+
+		public void drawStrings(int width = 1280, int height = 720)
 		{
 			_direct2DRenderTarget.BeginDraw();
-		}
 
-		public void End()
-		{
+			foreach (string key in drawList.Keys)
+			{
+				FontData drawTarget = drawList[key];
+				_direct2DRenderTarget.DrawText(drawTarget.text, _directWriteTextFormat, new RawRectangleF(drawTarget.x, drawTarget.y, width, height), _directWriteFontColor);
+			}
+
 			_direct2DRenderTarget.EndDraw();
 		}
 
