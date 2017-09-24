@@ -1,8 +1,6 @@
-﻿using System.Diagnostics;
-
-namespace MelloRin.CSd3d.Lib
+﻿namespace MelloRin.CSd3d.Lib
 {
-    public static class PublicData_manager
+	public static class PublicData_manager
     {
         public static bool device_created = false;
 

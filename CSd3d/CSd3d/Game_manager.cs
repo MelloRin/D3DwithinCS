@@ -7,32 +7,31 @@ using Timer = System.Timers.Timer;
 
 namespace MelloRin.CSd3d
 {
-	class Game_manager : Itask
+	class Game : Itask
 	{
 		static public bool gameRunning { get; private set; }
-		private D3D_handler drawer;
+		private D3Dhandler drawer;
 		private Timer timer;
 		private int sec;
 
-		public Game_manager(D3D_handler drawer)
+		public Game(D3Dhandler drawer)
 		{
 			this.drawer = drawer;
 
 			drawer.font.addTextList("gamestate", "running", 100, 100);
 
-			timer = new Timer();
-			timer.Interval = 1000;
+			timer = new Timer
+			{
+				Interval = 1000
+			};
 			timer.Elapsed += _timerEvent;
 		}
 
 		private void _timerEvent(object sender, ElapsedEventArgs e)
 		{
 			Console.WriteLine("{0}sec elapsed...", ++sec);
-			/*drawer.font.Begin();
-			drawer.font.DrawString(sec.ToString(),100,100);
-			drawer.font.End();*/
 
-			if (sec > 10)
+			if (sec >= 1)
 			{
 				gameRunning = false;
 				Console.WriteLine("Timer Stoped");

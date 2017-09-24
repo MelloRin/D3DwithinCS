@@ -65,7 +65,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="D2DFont.cs" />
-    <Compile Include="D3D_handler.cs" />
+    <Compile Include="D2D_Sprite.cs" />
+    <Compile Include="D3Dhandler.cs" />
     <Compile Include="Game_manager.cs" />
     <Compile Include="Lib\PublicData_manager.cs" />
     <Compile Include="Lib\Savedata_manager.cs" />
@@ -91,6 +92,9 @@
       <Project>{41e69564-6015-43bf-a8aa-ab9c10cdaa55}</Project>
       <Name>FileManager</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="res\sprite\note_blue.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

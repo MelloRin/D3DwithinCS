@@ -89,10 +89,13 @@ namespace MelloRin.CSd3d
 		{
 			_direct2DRenderTarget.BeginDraw();
 
-			foreach (string key in drawList.Keys)
+			lock(drawList)
 			{
-				FontData drawTarget = drawList[key];
-				_direct2DRenderTarget.DrawText(drawTarget.text, _directWriteTextFormat, new RawRectangleF(drawTarget.x, drawTarget.y, width, height), _directWriteFontColor);
+				foreach (string key in drawList.Keys)
+				{
+					FontData drawTarget = drawList[key];
+					_direct2DRenderTarget.DrawText(drawTarget.text, _directWriteTextFormat, new RawRectangleF(drawTarget.x, drawTarget.y, width, height), _directWriteFontColor);
+				}
 			}
 
 			_direct2DRenderTarget.EndDraw();

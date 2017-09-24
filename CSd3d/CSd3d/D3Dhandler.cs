@@ -6,6 +6,7 @@ using SharpDX.DXGI;
 using SharpDX.Mathematics.Interop;
 using SharpDX.Windows;
 using System;
+using System.Diagnostics;
 using System.Threading;
 using System.Timers;
 using System.Windows.Forms;
@@ -15,7 +16,7 @@ using Timer = System.Timers.Timer;
 
 namespace MelloRin.CSd3d
 {
-	class D3D_handler : IDisposable, Itask
+	class D3Dhandler : IDisposable, Itask
 	{
 		//form
 		private RenderForm targetForm;
@@ -34,38 +35,36 @@ namespace MelloRin.CSd3d
 
 		//vsync
 		private readonly int targetFPS = 60;
-		private int lastFrameTime;
 
-		private int msPerFPS;
-		/*private double leftMsPerFPS;
-		private double leftMs = 0d;*/
+		Stopwatch renderTimer;
+		Timer timer;
 
-		private int renderTime;
+		private long nextRenderStartTime;
 		private int sleepTime;
 
-		private int currentFrameTime;
+		private int msPerFPS { get; }
+
 		private int frame = 0;
 
 		//background
 		private bool b_up = false;
 		private float B = 0f;
 
-		public D3D_handler(RenderForm mainForm)
+		public D3Dhandler(RenderForm mainForm)
 		{
 			targetForm = mainForm;
 			msPerFPS = 1000 / targetFPS;
-			/*leftMsPerFPS = 1000f / targetFPS;
-			msPerFPS = (Int32)leftMsPerFPS;
-			leftMsPerFPS -= msPerFPS;*/
 
-			Timer timer = new Timer();
-			timer.Interval = 1000;
+			renderTimer = new Stopwatch();
+			timer = new Timer
+			{
+				Interval = 1000
+			};
 			timer.Elapsed += new ElapsedEventHandler((object sender, ElapsedEventArgs e) =>
 			{
 				Console.WriteLine("{0}fps", frame);
 				frame = 0;
 			});
-			timer.Start();
 		}
 
 		public void run()
@@ -74,15 +73,35 @@ namespace MelloRin.CSd3d
 
 			Thread _Td3d = new Thread(() =>
 			{
+				timer.Start();
+				renderTimer.Start();
+
 				while (targetForm.Created)
 				{
-					loop();
-					vSync();
+					nextRenderStartTime = renderTimer.ElapsedMilliseconds + msPerFPS;
+					try
+					{
+						background_Render();
+						font.drawStrings();
+
+						Present();
+						++frame;
+					}
+					catch (SharpDXException e)
+					{
+						Console.WriteLine("D3D 에러" + e.ToString());
+						return;
+					}
+
+					sleepTime = (Int32)(nextRenderStartTime - renderTimer.ElapsedMilliseconds);
+
+					if (sleepTime > 0)
+					{
+						Thread.Sleep(sleepTime);
+					}
 				}
 				Dispose();
 			});
-
-
 			_Td3d.Start();
 
 			PublicData_manager.currentTaskQueue.runNext();
@@ -90,7 +109,7 @@ namespace MelloRin.CSd3d
 
 		private void createDevice()
 		{
-			targetForm.Invoke(new MethodInvoker(delegate ()
+			targetForm.Invoke(new MethodInvoker(() =>
 			{
 				desc = new SwapChainDescription()
 				{
@@ -121,8 +140,8 @@ namespace MelloRin.CSd3d
 			_backBufferTexture = _swapChain.GetBackBuffer<Texture2D>(0);
 			font = new D2DFont(_backBufferTexture);
 
-			font.addTextList("tittle","Hello SharpDX", 0, 0);
-			font.addTextList("nowTime","Current Time " + DateTime.Now.ToString(), 0, 32);
+			font.addTextList("tittle", "Hello SharpDX", 0, 0);
+			font.addTextList("nowTime", "Current Time " + DateTime.Now.ToString(), 0, 32);
 
 			_backbufferView = new RenderTargetView(_device, _backBufferTexture);
 
@@ -147,54 +166,6 @@ namespace MelloRin.CSd3d
 			_zbufferTexture.Dispose();
 
 			setDefaultTargets();
-		}
-
-		private void loop()
-		{
-			lastFrameTime = DateTime.Now.Millisecond;
-			try
-			{
-				background_Render();
-				
-				font.drawStrings();
-
-				Present();
-
-				++frame;
-			}
-			catch (SharpDXException e)
-			{
-				Console.WriteLine("D3D 에러" + e.ToString());
-				return;
-			}
-
-		}
-
-		private void vSync()
-		{
-			currentFrameTime = DateTime.Now.Millisecond;
-			if (lastFrameTime > currentFrameTime)
-			{
-				renderTime = (currentFrameTime + 1000) - lastFrameTime;
-			}
-			else
-			{
-				renderTime = currentFrameTime - lastFrameTime;
-			}
-			/*leftMs += leftMsPerFPS;
-
-			if (leftMs >= 1d)
-			{
-				int errorCorrect = (Int32)leftMs;
-				sleepTime = (msPerFPS - renderTime) + errorCorrect;
-				leftMs -= errorCorrect;
-			}
-			else*/
-				sleepTime = msPerFPS - renderTime;
-			if (sleepTime > 0)
-			{
-				Thread.Sleep(sleepTime);
-			}
 		}
 
 		private void background_Render()
@@ -243,6 +214,12 @@ namespace MelloRin.CSd3d
 		{
 			if (_device != null)
 				_device.Dispose();
+			if (font != null)
+				font.Dispose();
+			if (timer != null)
+				timer.Dispose();
+			if (renderTimer != null)
+				renderTimer = null;
 		}
 	}
 }
