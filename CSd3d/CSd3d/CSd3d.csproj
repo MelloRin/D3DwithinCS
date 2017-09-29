@@ -30,6 +30,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="SharpDX, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
       <HintPath>..\packages\SharpDX.4.0.1\lib\net45\SharpDX.dll</HintPath>
@@ -65,9 +68,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="D2DFont.cs" />
-    <Compile Include="D2D_Sprite.cs" />
+    <Compile Include="D2DSprite.cs" />
     <Compile Include="D3Dhandler.cs" />
-    <Compile Include="Game_manager.cs" />
+    <Compile Include="Game.cs" />
+    <Compile Include="Lib\FontData.cs" />
     <Compile Include="Lib\PublicData_manager.cs" />
     <Compile Include="Lib\Savedata_manager.cs" />
     <Compile Include="Lib\Setting_manager.cs" />

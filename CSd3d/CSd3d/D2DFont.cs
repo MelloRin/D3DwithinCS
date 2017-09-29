@@ -1,79 +1,44 @@
 ﻿using SharpDX;
 using SharpDX.Direct2D1;
 using SharpDX.Direct3D11;
-using SharpDX.DirectWrite;
 using SharpDX.DXGI;
 using SharpDX.Mathematics.Interop;
 using System;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
+
+using MelloRin.CSd3d.Lib;
 
 namespace MelloRin.CSd3d
 {
 	public class D2DFont : IDisposable
 	{
-		private TextFormat _directWriteTextFormat;
-		private SolidColorBrush _directWriteFontColor;
-		private RenderTarget _direct2DRenderTarget;
+		public RenderTarget _renderTarget { get; private set; }
+		private ConcurrentDictionary<string, FontData> drawList = new ConcurrentDictionary<string, FontData>();
 
-		private Color _fontColor = Color.White;
-		private string _fontName = "Calibri";
-		private int _fontSize = 22;
-
-		private Dictionary<string, FontData> drawList = new Dictionary<string, FontData>();
-
-		private class FontData
-		{
-			public string text { get; private set; }
-			public int x { get; private set; }
-			public int y { get; private set; }
-
-			public FontData(string text, int targetX = 0, int targetY = 0)
-			{
-				this.text = text;
-				x = targetX;
-				y = targetY;
-			}
-		}
+		private Bitmap test;
 
 		public D2DFont(Texture2D backBuffer)
 		{
 			var d2dFactory = new SharpDX.Direct2D1.Factory();
 			var d2dSurface = backBuffer.QueryInterface<Surface>();
-			_direct2DRenderTarget = new RenderTarget(d2dFactory, d2dSurface, new RenderTargetProperties(new PixelFormat(Format.Unknown, SharpDX.Direct2D1.AlphaMode.Premultiplied)));
+			_renderTarget = new RenderTarget(d2dFactory, d2dSurface, new RenderTargetProperties(new PixelFormat(Format.Unknown, SharpDX.Direct2D1.AlphaMode.Premultiplied)));
 
 			d2dSurface.Dispose();
 			d2dFactory.Dispose();
 
-			InitFont();
+			string imageSrc = String.Format("{0}\\res\\sprite\\{1}", System.IO.Directory.GetCurrentDirectory(), "note_blue.png");
+			test = D2DSprite.LoadFromFile(_renderTarget, imageSrc);
 		}
 
-		public void SetFont(Color fontColor, string fontName = "Calibri", int fontSize = 22)
-		{
-			_fontColor = fontColor;
-			_fontName = fontName;
-			_fontSize = fontSize;
-
-			InitFont();
-		}
-
-		private void InitFont()
-		{
-			var directWriteFactory = new SharpDX.DirectWrite.Factory();
-			_directWriteTextFormat = new TextFormat(directWriteFactory, _fontName, _fontSize)
-			{ TextAlignment = TextAlignment.Leading, ParagraphAlignment = ParagraphAlignment.Near };
-			_directWriteFontColor = new SolidColorBrush(_direct2DRenderTarget, _fontColor);
-			directWriteFactory.Dispose();
-		}
-
-		public void addTextList(string key, string text, int targetX = 0, int targetY = 0)
+		public void addTextList(string key, FontData fontData)
 		{
 			if (drawList.ContainsKey(key))
 			{
-				drawList[key] = new FontData(text, targetX, targetY);
+				drawList[key] = fontData;
 			}
 			else
 			{
-				drawList.Add(key, new FontData(text, targetX, targetY));
+				drawList.TryAdd(key, fontData);
 			}
 		}
 
@@ -81,31 +46,37 @@ namespace MelloRin.CSd3d
 		{
 			if (drawList.ContainsKey(key))
 			{
-				drawList.Remove(key);
+				drawList.TryRemove(key, out FontData temp);
 			}
 		}
-
 		public void drawStrings(int width = 1280, int height = 720)
 		{
-			_direct2DRenderTarget.BeginDraw();
+			_renderTarget.BeginDraw();
 
-			lock(drawList)
+			foreach (string key in drawList.Keys)
 			{
-				foreach (string key in drawList.Keys)
-				{
-					FontData drawTarget = drawList[key];
-					_direct2DRenderTarget.DrawText(drawTarget.text, _directWriteTextFormat, new RawRectangleF(drawTarget.x, drawTarget.y, width, height), _directWriteFontColor);
-				}
+				FontData drawTarget = drawList[key];
+				_renderTarget.DrawText(drawTarget.text, drawTarget._directWriteTextFormat, new RawRectangleF(drawTarget.x, drawTarget.y, width, height), drawTarget._directWriteFontColor);
 			}
 
-			_direct2DRenderTarget.EndDraw();
+			//_renderTarget.DrawBitmap(test,new RawRectangleF(300,300,test.Size.Width,test.Size.Height), 0.1f, BitmapInterpolationMode.Linear);
+
+			//_renderTarget.DrawBitmap(test, 1f, BitmapInterpolationMode.Linear);
+			//SharpDX.Direct2D1.BitmapRenderTarget _bmpRenderTarget = new SharpDX.Direct2D1.BitmapRenderTarget(_renderTarget,CompatibleRenderTargetOptions.GdiCompatible);
+
+			_renderTarget.EndDraw();
 		}
 
 		public void Dispose()
 		{
-			Utilities.Dispose(ref _directWriteTextFormat);
-			Utilities.Dispose(ref _directWriteFontColor);
-			Utilities.Dispose(ref _direct2DRenderTarget);
+			foreach (string key in drawList.Keys)
+			{
+				FontData drawTarget = drawList[key];
+
+				drawTarget.Dispose();
+			}
+
+			_renderTarget.Dispose();
 		}
 	}
 }

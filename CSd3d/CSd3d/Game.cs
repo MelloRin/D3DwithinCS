@@ -1,4 +1,5 @@
 ﻿using MelloRin.CSd3d.Lib;
+using SharpDX;
 using System;
 using System.Threading;
 using System.Timers;
@@ -18,7 +19,7 @@ namespace MelloRin.CSd3d
 		{
 			this.drawer = drawer;
 
-			drawer.font.addTextList("gamestate", "running", 100, 100);
+			drawer.font.addTextList("gamestate", new FontData("running", drawer.font._renderTarget, Color.YellowGreen,100,100,30));
 
 			timer = new Timer
 			{
@@ -31,7 +32,7 @@ namespace MelloRin.CSd3d
 		{
 			Console.WriteLine("{0}sec elapsed...", ++sec);
 
-			if (sec >= 1)
+			if (sec >= 5)
 			{
 				gameRunning = false;
 				Console.WriteLine("Timer Stoped");

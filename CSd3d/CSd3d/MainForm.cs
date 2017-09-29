@@ -10,12 +10,24 @@ namespace MelloRin.CSd3d
 {
 	class MainForm : RenderForm, Itask
 	{
+		private bool[] keyInputList = new bool[Setting_manager.input_keys_key.Length];
 		public MainForm()
 		{
-			windowsizeAdjust();
+			AutoScaleDimensions = new SizeF(7F, 12F);
+			AutoScaleMode = AutoScaleMode.Font;
+			FormBorderStyle = FormBorderStyle.FixedSingle;
+
+			if (!UInt32.TryParse(PublicData_manager.settings.get_setting("width"), out uint width)
+			|| !UInt32.TryParse(PublicData_manager.settings.get_setting("height"), out uint height))
+			{
+				width = 1280;
+				height = 720;
+			}
+			ClientSize = new Size((int)width, (int)height);
 
 			FormClosed += new FormClosedEventHandler(_formClosed);
 			KeyDown += new KeyEventHandler(_keyDown);
+			KeyUp += new KeyEventHandler(_keyUp);
 			MaximizeBox = false;
 			Icon = null;
 			Text = "Test";
@@ -34,26 +46,8 @@ namespace MelloRin.CSd3d
 			});
 
 			_TmainThread.Start();
-
 			PublicData_manager.currentTaskQueue.runNext();
 		}
-
-		public void windowsizeAdjust()
-		{
-			AutoScaleDimensions = new SizeF(7F, 12F);
-			AutoScaleMode = AutoScaleMode.Font;
-			FormBorderStyle = FormBorderStyle.FixedSingle;
-
-			uint width, height;
-			if (!UInt32.TryParse(PublicData_manager.settings.get_setting("width"), out width)
-			|| !UInt32.TryParse(PublicData_manager.settings.get_setting("height"), out height))
-			{
-				width = 1280;
-				height = 720;
-			}
-			ClientSize = new Size((int)width, (int)height);
-		}
-
 
 		private void _keyDown(object sender, KeyEventArgs e)
 		{
@@ -61,14 +55,55 @@ namespace MelloRin.CSd3d
 
 			if (PublicData_manager.settings.input_key_search(input))
 			{
-				if (input.Equals(PublicData_manager.settings.get_input_keys(Setting_manager.input_keys_key[0])))
+				if (input.Equals(PublicData_manager.settings.get_input_keys(Setting_manager.input_keys_key[0])) && !keyInputList[0])
+				{
 					Console.WriteLine("(UP)key DOWN");
-				if (input.Equals(PublicData_manager.settings.get_input_keys(Setting_manager.input_keys_key[1])))
+					keyInputList[0] = true;
+				}
+				if (input.Equals(PublicData_manager.settings.get_input_keys(Setting_manager.input_keys_key[1])) && !keyInputList[1])
+				{
 					Console.WriteLine("(DOWN)key DOWN");
-				if (input.Equals(PublicData_manager.settings.get_input_keys(Setting_manager.input_keys_key[2])))
+					keyInputList[1] = true;
+				}
+				if (input.Equals(PublicData_manager.settings.get_input_keys(Setting_manager.input_keys_key[2])) && !keyInputList[2])
+				{
 					Console.WriteLine("(LEFT)key DOWN");
-				if (input.Equals(PublicData_manager.settings.get_input_keys(Setting_manager.input_keys_key[3])))
+					keyInputList[2] = true;
+				}
+				if (input.Equals(PublicData_manager.settings.get_input_keys(Setting_manager.input_keys_key[3])) && !keyInputList[3])
+				{
 					Console.WriteLine("(RIGHT)key DOWN");
+					keyInputList[3] = true;
+				}
+			}
+		}
+
+		private void _keyUp(object sender, KeyEventArgs e)
+		{
+			string input = e.KeyCode.ToString().ToLower();
+
+			if (PublicData_manager.settings.input_key_search(input))
+			{
+				if (input.Equals(PublicData_manager.settings.get_input_keys(Setting_manager.input_keys_key[0])))
+				{
+					Console.WriteLine("(UP)key UP");
+					keyInputList[0] = false;
+				}
+				if (input.Equals(PublicData_manager.settings.get_input_keys(Setting_manager.input_keys_key[1])))
+				{
+					Console.WriteLine("(DOWN)key UP");
+					keyInputList[1] = false;
+				}
+				if (input.Equals(PublicData_manager.settings.get_input_keys(Setting_manager.input_keys_key[2])))
+				{
+					Console.WriteLine("(LEFT)key UP");
+					keyInputList[2] = false;
+				}
+				if (input.Equals(PublicData_manager.settings.get_input_keys(Setting_manager.input_keys_key[3])))
+				{
+					Console.WriteLine("(RIGHT)key UP");
+					keyInputList[3] = false;
+				}
 			}
 		}
 

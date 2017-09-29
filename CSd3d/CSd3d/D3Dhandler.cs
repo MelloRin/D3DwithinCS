@@ -7,6 +7,7 @@ using SharpDX.Mathematics.Interop;
 using SharpDX.Windows;
 using System;
 using System.Diagnostics;
+using System.IO;
 using System.Threading;
 using System.Timers;
 using System.Windows.Forms;
@@ -18,6 +19,7 @@ namespace MelloRin.CSd3d
 {
 	class D3Dhandler : IDisposable, Itask
 	{
+		#region field members
 		//form
 		private RenderForm targetForm;
 
@@ -36,19 +38,20 @@ namespace MelloRin.CSd3d
 		//vsync
 		private readonly int targetFPS = 60;
 
-		Stopwatch renderTimer;
-		Timer timer;
+		private Stopwatch renderTimer;
+		private Timer timer;
 
+		private int msPerFPS { get; }
 		private long nextRenderStartTime;
 		private int sleepTime;
 
-		private int msPerFPS { get; }
-
 		private int frame = 0;
+		private StreamWriter writer = new StreamWriter("log.txt");
 
 		//background
 		private bool b_up = false;
 		private float B = 0f;
+		#endregion
 
 		public D3Dhandler(RenderForm mainForm)
 		{
@@ -62,6 +65,8 @@ namespace MelloRin.CSd3d
 			};
 			timer.Elapsed += new ElapsedEventHandler((object sender, ElapsedEventArgs e) =>
 			{
+				font.addTextList("nowTime", new FontData("Current Time " + DateTime.Now.ToString(), font._renderTarget, Color.Red, 0, 32));
+
 				Console.WriteLine("{0}fps", frame);
 				frame = 0;
 			});
@@ -75,6 +80,7 @@ namespace MelloRin.CSd3d
 			{
 				timer.Start();
 				renderTimer.Start();
+				//Clear(new RawColor4(0, 0, 0, 1));
 
 				while (targetForm.Created)
 				{
@@ -94,17 +100,38 @@ namespace MelloRin.CSd3d
 					}
 
 					sleepTime = (Int32)(nextRenderStartTime - renderTimer.ElapsedMilliseconds);
-
+					writer.WriteLine("{0}ms Sleep", sleepTime);
 					if (sleepTime > 0)
 					{
 						Thread.Sleep(sleepTime);
 					}
 				}
+				writer.Close();
 				Dispose();
 			});
 			_Td3d.Start();
 
 			PublicData_manager.currentTaskQueue.runNext();
+		}
+
+		private void constructing()
+		{
+			/*Dictionary<string,Action> list = new Dictionary<string, Action>();
+					
+			ConcurrentDictionary<string, int> test = new ConcurrentDictionary<string, int>();
+
+			Thread[] thread = new Thread[10];
+			Thread _Ttest = new Thread(() =>
+			{
+
+
+			});
+
+			list.Add("asdf",temp);
+
+			Action[] action = new Action[list.Count];
+			list.Values.CopyTo(action, 0);
+			Parallel.Invoke(action);*/
 		}
 
 		private void createDevice()
@@ -140,8 +167,7 @@ namespace MelloRin.CSd3d
 			_backBufferTexture = _swapChain.GetBackBuffer<Texture2D>(0);
 			font = new D2DFont(_backBufferTexture);
 
-			font.addTextList("tittle", "Hello SharpDX", 0, 0);
-			font.addTextList("nowTime", "Current Time " + DateTime.Now.ToString(), 0, 32);
+			font.addTextList("tittle", new FontData("Hello SharpDX", font._renderTarget, Color.White));
 
 			_backbufferView = new RenderTargetView(_device, _backBufferTexture);
 
@@ -192,17 +218,13 @@ namespace MelloRin.CSd3d
 			Clear(new RawColor4(0, 0, B, 1));
 		}
 
-
 		private void Clear(RawColor4 color)
 		{
 			_deviceContext.ClearRenderTargetView(_backbufferView, color);
 			_deviceContext.ClearDepthStencilView(_zbufferView, DepthStencilClearFlags.Depth, 1.0F, 0);
 		}
 
-		private void Present()
-		{
-			_swapChain.Present(0, PresentFlags.None);
-		}
+		private void Present() { _swapChain.Present(0, PresentFlags.None); }
 
 		private void setDefaultTargets()
 		{
