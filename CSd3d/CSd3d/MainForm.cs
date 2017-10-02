@@ -25,9 +25,19 @@ namespace MelloRin.CSd3d
 			}
 			ClientSize = new Size((int)width, (int)height);
 
-			FormClosed += new FormClosedEventHandler(_formClosed);
-			KeyDown += new KeyEventHandler(_keyDown);
-			KeyUp += new KeyEventHandler(_keyUp);
+			FormClosed += new FormClosedEventHandler(_EformClosed);
+			KeyDown += new KeyEventHandler(_EkeyDown);
+			KeyUp += new KeyEventHandler(_EkeyUp);
+
+			MouseClick += new MouseEventHandler((object sender, MouseEventArgs e) =>
+			{
+				foreach (string i in D2DSprite._LSprite.Keys)
+				{
+					SpriteData seekTarget = D2DSprite._LSprite[i];
+					seekTarget.collisionCheck(e.X, e.Y);
+				}
+			});
+
 			MaximizeBox = false;
 			Icon = null;
 			Text = "Test";
@@ -41,7 +51,7 @@ namespace MelloRin.CSd3d
 				while (Created)
 				{
 					Application.DoEvents();
-					Thread.Sleep(5);
+					Thread.Sleep(2);
 				}
 			});
 
@@ -49,7 +59,7 @@ namespace MelloRin.CSd3d
 			PublicData_manager.currentTaskQueue.runNext();
 		}
 
-		private void _keyDown(object sender, KeyEventArgs e)
+		private void _EkeyDown(object sender, KeyEventArgs e)
 		{
 			string input = e.KeyCode.ToString().ToLower();
 
@@ -78,7 +88,7 @@ namespace MelloRin.CSd3d
 			}
 		}
 
-		private void _keyUp(object sender, KeyEventArgs e)
+		private void _EkeyUp(object sender, KeyEventArgs e)
 		{
 			string input = e.KeyCode.ToString().ToLower();
 
@@ -107,7 +117,7 @@ namespace MelloRin.CSd3d
 			}
 		}
 
-		private void _formClosed(object sender, FormClosedEventArgs e)
+		private void _EformClosed(object sender, FormClosedEventArgs e)
 		{
 			DataSet dataSet = new DataSet();
 

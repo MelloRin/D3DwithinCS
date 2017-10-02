@@ -1,4 +1,4 @@
-﻿using SharpDX;
+﻿using MelloRin.CSd3d.Lib;
 using SharpDX.Direct2D1;
 using SharpDX.Direct3D11;
 using SharpDX.DXGI;
@@ -6,77 +6,66 @@ using SharpDX.Mathematics.Interop;
 using System;
 using System.Collections.Concurrent;
 
-using MelloRin.CSd3d.Lib;
-
 namespace MelloRin.CSd3d
 {
-	public class D2DFont : IDisposable
+	public class D2DFont : IDisposable, IDrawable, IListable
 	{
-		public RenderTarget _renderTarget { get; private set; }
-		private ConcurrentDictionary<string, FontData> drawList = new ConcurrentDictionary<string, FontData>();
+		public RenderTarget renderTarget { get; private set; }
+		private ConcurrentDictionary<string, FontData> _Ldraw = new ConcurrentDictionary<string, FontData>();
 
-		private Bitmap test;
+		static public D2DSprite test;
 
 		public D2DFont(Texture2D backBuffer)
 		{
 			var d2dFactory = new SharpDX.Direct2D1.Factory();
 			var d2dSurface = backBuffer.QueryInterface<Surface>();
-			_renderTarget = new RenderTarget(d2dFactory, d2dSurface, new RenderTargetProperties(new PixelFormat(Format.Unknown, SharpDX.Direct2D1.AlphaMode.Premultiplied)));
+			renderTarget = new RenderTarget(d2dFactory, d2dSurface, new RenderTargetProperties(new PixelFormat(Format.Unknown, SharpDX.Direct2D1.AlphaMode.Premultiplied)));
 
 			d2dSurface.Dispose();
 			d2dFactory.Dispose();
-
-			string imageSrc = String.Format("{0}\\res\\sprite\\{1}", System.IO.Directory.GetCurrentDirectory(), "note_blue.png");
-			test = D2DSprite.LoadFromFile(_renderTarget, imageSrc);
 		}
 
-		public void addTextList(string key, FontData fontData)
+		public void add(string tag, ListData data)
 		{
-			if (drawList.ContainsKey(key))
+			if (_Ldraw.ContainsKey(tag))
 			{
-				drawList[key] = fontData;
+				_Ldraw[tag] = (FontData)data;
 			}
 			else
 			{
-				drawList.TryAdd(key, fontData);
+				_Ldraw.TryAdd(tag, (FontData)data);
 			}
 		}
 
-		public void deleteTextList(string key)
+		public void delete(string tag)
 		{
-			if (drawList.ContainsKey(key))
+			if (_Ldraw.ContainsKey(tag))
 			{
-				drawList.TryRemove(key, out FontData temp);
+				_Ldraw.TryRemove(tag, out FontData temp);
 			}
 		}
-		public void drawStrings(int width = 1280, int height = 720)
+		public void draw()
 		{
-			_renderTarget.BeginDraw();
+			renderTarget.BeginDraw();
 
-			foreach (string key in drawList.Keys)
+			foreach (string key in _Ldraw.Keys)
 			{
-				FontData drawTarget = drawList[key];
-				_renderTarget.DrawText(drawTarget.text, drawTarget._directWriteTextFormat, new RawRectangleF(drawTarget.x, drawTarget.y, width, height), drawTarget._directWriteFontColor);
+				FontData drawTarget = _Ldraw[key];
+				renderTarget.DrawText(drawTarget.text, drawTarget._directWriteTextFormat, new RawRectangleF(drawTarget.x, drawTarget.y, float.Parse(PublicData_manager.settings.get_setting("width")) , float.Parse(PublicData_manager.settings.get_setting("width"))), drawTarget._directWriteFontColor);
 			}
-
-			//_renderTarget.DrawBitmap(test,new RawRectangleF(300,300,test.Size.Width,test.Size.Height), 0.1f, BitmapInterpolationMode.Linear);
-
-			//_renderTarget.DrawBitmap(test, 1f, BitmapInterpolationMode.Linear);
-			//SharpDX.Direct2D1.BitmapRenderTarget _bmpRenderTarget = new SharpDX.Direct2D1.BitmapRenderTarget(_renderTarget,CompatibleRenderTargetOptions.GdiCompatible);
-
-			_renderTarget.EndDraw();
+			renderTarget.EndDraw();
 		}
 
 		public void Dispose()
 		{
-			foreach (string key in drawList.Keys)
+			foreach (string key in _Ldraw.Keys)
 			{
-				FontData drawTarget = drawList[key];
+				FontData drawTarget = _Ldraw[key];
 
 				drawTarget.Dispose();
 			}
 
-			_renderTarget.Dispose();
+			renderTarget.Dispose();
 		}
 	}
 }

@@ -19,7 +19,7 @@ namespace MelloRin.CSd3d
 		{
 			this.drawer = drawer;
 
-			drawer.font.addTextList("gamestate", new FontData("running", drawer.font._renderTarget, Color.YellowGreen,100,100,30));
+			drawer.font.add("gamestate", new FontData("running", drawer.font.renderTarget, Color.YellowGreen,100,100,30));
 
 			timer = new Timer
 			{
@@ -37,7 +37,7 @@ namespace MelloRin.CSd3d
 				gameRunning = false;
 				Console.WriteLine("Timer Stoped");
 
-				drawer.font.deleteTextList("gamestate");
+				drawer.font.delete("gamestate");
 				timer.Stop();
 			}
 		}

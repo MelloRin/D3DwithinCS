@@ -6,9 +6,11 @@ using SharpDX.DXGI;
 using SharpDX.Mathematics.Interop;
 using SharpDX.Windows;
 using System;
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Timers;
 using System.Windows.Forms;
 
@@ -32,8 +34,13 @@ namespace MelloRin.CSd3d
 
 		private Texture2D _backBufferTexture;
 		public D2DFont font { get; private set; }
+		public D2DSprite sprite { get; private set; }
 
 		private SwapChainDescription desc;
+
+		//rendertask
+		private ConcurrentDictionary<string, Action> _Ltask = new ConcurrentDictionary<string, Action>();
+		private Action[] task;
 
 		//vsync
 		private readonly int targetFPS = 60;
@@ -63,9 +70,9 @@ namespace MelloRin.CSd3d
 			{
 				Interval = 1000
 			};
-			timer.Elapsed += new ElapsedEventHandler((object sender, ElapsedEventArgs e) =>
+			timer.Elapsed += new ElapsedEventHandler((sender, e) =>
 			{
-				font.addTextList("nowTime", new FontData("Current Time " + DateTime.Now.ToString(), font._renderTarget, Color.Red, 0, 32));
+				font.add("nowTime", new FontData("Current Time " + DateTime.Now.ToString(), font.renderTarget, Color.Red, 0, 32));
 
 				Console.WriteLine("{0}fps", frame);
 				frame = 0;
@@ -82,14 +89,23 @@ namespace MelloRin.CSd3d
 				renderTimer.Start();
 				//Clear(new RawColor4(0, 0, 0, 1));
 
+				_Ltask.TryAdd("background", background_Render);
+				_Ltask.TryAdd("font", font.draw );
+				task = new Action[_Ltask.Count];
+				_Ltask.Values.CopyTo(task, 0);
+
 				while (targetForm.Created)
 				{
 					nextRenderStartTime = renderTimer.ElapsedMilliseconds + msPerFPS;
+					
 					try
 					{
 						background_Render();
-						font.drawStrings();
-
+						font.draw();
+						sprite.draw();
+						
+						//Parallel.Invoke(task);
+						
 						Present();
 						++frame;
 					}
@@ -100,7 +116,7 @@ namespace MelloRin.CSd3d
 					}
 
 					sleepTime = (Int32)(nextRenderStartTime - renderTimer.ElapsedMilliseconds);
-					writer.WriteLine("{0}ms Sleep", sleepTime);
+					//writer.WriteLine("{0}ms Sleep", sleepTime);
 					if (sleepTime > 0)
 					{
 						Thread.Sleep(sleepTime);
@@ -157,20 +173,16 @@ namespace MelloRin.CSd3d
 
 			_deviceContext = _device.ImmediateContext;
 
-			setDefault();
-
-			PublicData_manager.device_created = true;
-		}
-
-		private void setDefault()
-		{
 			_backBufferTexture = _swapChain.GetBackBuffer<Texture2D>(0);
 			font = new D2DFont(_backBufferTexture);
+			font.add("tittle", new FontData("Hello SharpDX", font.renderTarget, Color.White));
 
-			font.addTextList("tittle", new FontData("Hello SharpDX", font._renderTarget, Color.White));
+			string imageSrc = String.Format("{0}\\res\\sprite\\{1}", Directory.GetCurrentDirectory(), "note_blue.png");
+			sprite = new D2DSprite(_backBufferTexture);
+
+			sprite.add("note", new SpriteData(D2DSprite.makeBitmap(sprite.renderTarget, imageSrc), 300, 300, 1));
 
 			_backbufferView = new RenderTargetView(_device, _backBufferTexture);
-
 			_backBufferTexture.Dispose();
 
 			var _zbufferTexture = new Texture2D(_device, new Texture2DDescription()
@@ -191,7 +203,10 @@ namespace MelloRin.CSd3d
 			_zbufferView = new DepthStencilView(_device, _zbufferTexture);
 			_zbufferTexture.Dispose();
 
-			setDefaultTargets();
+			_deviceContext.Rasterizer.SetViewport(0, 0, targetForm.ClientSize.Width, targetForm.ClientSize.Height);
+			_deviceContext.OutputMerger.SetTargets(_zbufferView, _backbufferView);
+
+			PublicData_manager.device_created = true;
 		}
 
 		private void background_Render()
@@ -201,20 +216,15 @@ namespace MelloRin.CSd3d
 				if (B < 1f)
 					B += 0.01f;
 				else
-				{
 					b_up = false;
-				}
 			}
 			else
 			{
 				if (B >= 0f)
 					B -= 0.01f;
 				else
-				{
 					b_up = true;
-				}
 			}
-
 			Clear(new RawColor4(0, 0, B, 1));
 		}
 
@@ -226,11 +236,6 @@ namespace MelloRin.CSd3d
 
 		private void Present() { _swapChain.Present(0, PresentFlags.None); }
 
-		private void setDefaultTargets()
-		{
-			_deviceContext.Rasterizer.SetViewport(0, 0, targetForm.ClientSize.Width, targetForm.ClientSize.Height);
-			_deviceContext.OutputMerger.SetTargets(_zbufferView, _backbufferView);
-		}
 
 		public void Dispose()
 		{

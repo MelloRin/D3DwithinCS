@@ -6,7 +6,7 @@ using Color = SharpDX.Color4;
 
 namespace MelloRin.CSd3d.Lib
 {
-	public class FontData : IDisposable
+	public class FontData : ListData,IDisposable
 	{
 		private RenderTarget renderTarget;
 
@@ -52,7 +52,9 @@ namespace MelloRin.CSd3d.Lib
 
 		public void Dispose()
 		{
-			_directWriteFontColor.Dispose();
+			if(_directWriteFontColor != null)
+				_directWriteFontColor.Dispose();
+			if(_directWriteTextFormat != null)
 			_directWriteTextFormat.Dispose();
 		}
 	}
