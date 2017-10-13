@@ -44,6 +44,23 @@ namespace MelloRin.CSd3d
 				_Ldraw.TryRemove(tag, out FontData temp);
 			}
 		}
+
+		//usage = {only change x,y => modString("tag", x: 9, y: 10);} {only change text => modString("tag",text:" ");}
+		public void modString(string tag, string text = "", int x = -1, int y = -1)
+		{
+			if (_Ldraw.ContainsKey(tag))
+			{
+				if (text != "")
+					_Ldraw[tag].text = text;
+
+				if (x != -1)
+					_Ldraw[tag].x = x;
+
+				if (y != -1)
+					_Ldraw[tag].y = y;
+			}
+		}
+
 		public void draw()
 		{
 			renderTarget.BeginDraw();

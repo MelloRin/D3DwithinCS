@@ -97,8 +97,5 @@
       <Name>FileManager</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Content Include="res\sprite\note_blue.png" />
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

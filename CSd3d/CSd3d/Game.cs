@@ -8,7 +8,7 @@ using Timer = System.Timers.Timer;
 
 namespace MelloRin.CSd3d
 {
-	class Game : Itask
+	class Game : ITask
 	{
 		static public bool gameRunning { get; private set; }
 		private D3Dhandler drawer;

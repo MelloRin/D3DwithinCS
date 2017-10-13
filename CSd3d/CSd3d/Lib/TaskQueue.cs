@@ -1,6 +1,6 @@
 ﻿namespace MelloRin.CSd3d.Lib
 {
-	public interface Itask
+	public interface ITask
 	{
 		void run();
 	}
@@ -13,15 +13,15 @@
 		private class QueueData
 		{
 			private QueueData nextData = null;
-			public Itask task { get; }
+			public ITask task { get; }
 
-			public QueueData(Itask task) => this.task = task;
+			public QueueData(ITask task) => this.task = task;
 
 			public QueueData getNext() => nextData;
 			public void setNext(QueueData next) => nextData = next;
 		}
 
-		public void addTask(Itask data)
+		public void addTask(ITask data)
 		{
 			if (head == null)
 			{

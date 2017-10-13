@@ -8,7 +8,7 @@ using System.Windows.Forms;
 
 namespace MelloRin.CSd3d
 {
-	class MainForm : RenderForm, Itask
+	class MainForm : RenderForm, ITask
 	{
 		private bool[] keyInputList = new bool[Setting_manager.input_keys_key.Length];
 		public MainForm()

@@ -10,7 +10,6 @@ using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Timers;
 using System.Windows.Forms;
 
@@ -19,7 +18,7 @@ using Timer = System.Timers.Timer;
 
 namespace MelloRin.CSd3d
 {
-	class D3Dhandler : IDisposable, Itask
+	class D3Dhandler : IDisposable, ITask
 	{
 		#region field members
 		//form
@@ -40,7 +39,7 @@ namespace MelloRin.CSd3d
 
 		//rendertask
 		private ConcurrentDictionary<string, Action> _Ltask = new ConcurrentDictionary<string, Action>();
-		private Action[] task;
+		//private Action[] task;
 
 		//vsync
 		private readonly int targetFPS = 60;
@@ -48,8 +47,11 @@ namespace MelloRin.CSd3d
 		private Stopwatch renderTimer;
 		private Timer timer;
 
-		private int msPerFPS { get; }
+		private int msPerFPS;
 		private long nextRenderStartTime;
+		private double leftMsPerFPS;
+		private double leftMs = 0d;
+
 		private int sleepTime;
 
 		private int frame = 0;
@@ -63,7 +65,10 @@ namespace MelloRin.CSd3d
 		public D3Dhandler(RenderForm mainForm)
 		{
 			targetForm = mainForm;
-			msPerFPS = 1000 / targetFPS;
+			//msPerFPS = 1000 / targetFPS;
+			leftMsPerFPS = 1000f / targetFPS;
+			msPerFPS = (int)leftMsPerFPS;
+			leftMsPerFPS -= msPerFPS;
 
 			renderTimer = new Stopwatch();
 			timer = new Timer
@@ -72,9 +77,9 @@ namespace MelloRin.CSd3d
 			};
 			timer.Elapsed += new ElapsedEventHandler((sender, e) =>
 			{
-				font.add("nowTime", new FontData("Current Time " + DateTime.Now.ToString(), font.renderTarget, Color.Red, 0, 32));
+				font.modString("fps", text: frame + " fps");
+				font.modString("nowTime", text: "Current Time " + DateTime.Now.ToString());
 
-				Console.WriteLine("{0}fps", frame);
 				frame = 0;
 			});
 		}
@@ -89,23 +94,23 @@ namespace MelloRin.CSd3d
 				renderTimer.Start();
 				//Clear(new RawColor4(0, 0, 0, 1));
 
-				_Ltask.TryAdd("background", background_Render);
-				_Ltask.TryAdd("font", font.draw );
+				/*_Ltask.TryAdd("background", background_Render);
+				_Ltask.TryAdd("font", font.draw);
 				task = new Action[_Ltask.Count];
-				_Ltask.Values.CopyTo(task, 0);
+				_Ltask.Values.CopyTo(task, 0);*/
 
 				while (targetForm.Created)
 				{
 					nextRenderStartTime = renderTimer.ElapsedMilliseconds + msPerFPS;
-					
+
 					try
 					{
 						background_Render();
 						font.draw();
 						sprite.draw();
-						
+
 						//Parallel.Invoke(task);
-						
+
 						Present();
 						++frame;
 					}
@@ -115,7 +120,15 @@ namespace MelloRin.CSd3d
 						return;
 					}
 
-					sleepTime = (Int32)(nextRenderStartTime - renderTimer.ElapsedMilliseconds);
+					if (leftMs >= 1d)
+					{
+						int errorCorrect = (int)leftMs;
+						nextRenderStartTime += errorCorrect;
+						leftMs -= errorCorrect;
+					}
+
+					leftMs += leftMsPerFPS;
+					sleepTime = (int)(nextRenderStartTime - renderTimer.ElapsedMilliseconds);
 					//writer.WriteLine("{0}ms Sleep", sleepTime);
 					if (sleepTime > 0)
 					{
@@ -133,7 +146,7 @@ namespace MelloRin.CSd3d
 		private void constructing()
 		{
 			/*Dictionary<string,Action> list = new Dictionary<string, Action>();
-					
+
 			ConcurrentDictionary<string, int> test = new ConcurrentDictionary<string, int>();
 
 			Thread[] thread = new Thread[10];
@@ -175,7 +188,10 @@ namespace MelloRin.CSd3d
 
 			_backBufferTexture = _swapChain.GetBackBuffer<Texture2D>(0);
 			font = new D2DFont(_backBufferTexture);
-			font.add("tittle", new FontData("Hello SharpDX", font.renderTarget, Color.White));
+			//font.add("tittle", new FontData("Hello SharpDX", font.renderTarget, Color.White));
+
+			font.add("fps", new FontData(frame + " fps", font.renderTarget, Color.White));
+			font.add("nowTime", new FontData("Current Time " + DateTime.Now.ToString(), font.renderTarget, Color.Red, 0, 32));
 
 			string imageSrc = String.Format("{0}\\res\\sprite\\{1}", Directory.GetCurrentDirectory(), "note_blue.png");
 			sprite = new D2DSprite(_backBufferTexture);

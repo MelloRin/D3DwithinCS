@@ -1,7 +1,9 @@
 ﻿using SharpDX;
 using SharpDX.Direct2D1;
 using SharpDX.DXGI;
+using SharpDX.IO;
 using SharpDX.Mathematics.Interop;
+using SharpDX.WIC;
 using System;
 using System.Collections.Concurrent;
 using System.Drawing.Imaging;
@@ -32,9 +34,9 @@ namespace MelloRin.CSd3d
 
 		public void collisionCheck(int pointX, int pointY)
 		{
-			if (pointX >= x && pointX <= x + (Int32)bitmap.Size.Width)
+			if (pointX >= x && pointX <= x + (int)bitmap.Size.Width / 4)
 			{
-				if (pointY >= y && pointY <= y + (Int32)bitmap.Size.Height)
+				if (pointY >= y && pointY <= y + (int)bitmap.Size.Height / 4)
 				{
 					OnMouseClick?.Invoke(null, null);
 				}
@@ -68,13 +70,35 @@ namespace MelloRin.CSd3d
 	{
 		public static ConcurrentDictionary<string, SpriteData> _LSprite = new ConcurrentDictionary<string, SpriteData>();
 		public RenderTarget renderTarget { get; private set; }
+		static private BitmapBrush bitmapBrush = null;
 
 		public static D2Bitmap makeBitmap(RenderTarget renderTarget, string imgSource)
 		{
 			try
 			{
-				Bitmap bmp = new Bitmap(imgSource);
+				ImagingFactory imagingFactory = new ImagingFactory();
+				NativeFileStream fileStream = new NativeFileStream(imgSource,
+					NativeFileMode.Open, NativeFileAccess.Read);
+				BitmapDecoder bitmapDecoder = new BitmapDecoder(imagingFactory, fileStream, DecodeOptions.CacheOnDemand);
 
+				BitmapFrameDecode frame = bitmapDecoder.GetFrame(0);
+
+				FormatConverter converter = new FormatConverter(imagingFactory);
+				converter.Initialize(frame, SharpDX.WIC.PixelFormat.Format32bppPRGBA);
+
+				D2Bitmap bitmap = D2Bitmap.FromWicBitmap(renderTarget, converter);
+
+				Utilities.Dispose(ref bitmapDecoder);
+				Utilities.Dispose(ref fileStream);
+				Utilities.Dispose(ref imagingFactory);
+
+				bitmapBrush = new BitmapBrush(renderTarget, bitmap, new BitmapBrushProperties() { ExtendModeX = ExtendMode.Wrap, ExtendModeY = ExtendMode.Wrap });
+
+				return bitmap;
+
+				/*
+				Bitmap bmp = new Bitmap(imgSource);
+				
 				BitmapData bmpData = bmp.LockBits(new System.Drawing.Rectangle(0, 0, bmp.Width, bmp.Height), ImageLockMode.ReadOnly, bmp.PixelFormat);
 
 				if (System.Drawing.Image.IsAlphaPixelFormat(bmp.PixelFormat))
@@ -85,12 +109,15 @@ namespace MelloRin.CSd3d
 				BitmapProperties bmpProps = new BitmapProperties(pFormat);
 
 				D2Bitmap bitmap = new D2Bitmap(renderTarget, new Size2(bmp.Width, bmp.Height), stream, bmpData.Stride, bmpProps);
+				
 				bmp.UnlockBits(bmpData);
 
 				stream.Dispose();
 				bmp.Dispose();
 
-				return bitmap;
+				bitmapBrush = new BitmapBrush(renderTarget, bitmap, new BitmapBrushProperties() { ExtendModeX = ExtendMode.Wrap, ExtendModeY = ExtendMode.Wrap });
+				
+				return bitmap;*/
 			}
 			catch (FileNotFoundException)
 			{
@@ -140,10 +167,14 @@ namespace MelloRin.CSd3d
 		{
 			renderTarget.BeginDraw();
 
+			renderTarget.Transform = Matrix3x2.Translation(300, 300);
+			renderTarget.FillRectangle(new RectangleF(0, 0, (256), (256)), bitmapBrush);
+
 			foreach (string key in _LSprite.Keys)
 			{
-				SpriteData drawTarget = _LSprite[key];
-				renderTarget.DrawBitmap(drawTarget.bitmap, new RawRectangleF(300, 300, 300 + (drawTarget.bitmap.Size.Width / 4), 300 + (drawTarget.bitmap.Size.Height / 4)), 1f, BitmapInterpolationMode.Linear);
+				//SpriteData drawTarget = _LSprite[key];
+				//renderTarget.DrawBitmap(drawTarget.bitmap, 1f, BitmapInterpolationMode.Linear);
+				//renderTarget.DrawBitmap(drawTarget.bitmap, new RawRectangleF(300, 300, 300 + (drawTarget.bitmap.Size.Width / 4), 300 + (drawTarget.bitmap.Size.Height / 4)), 1f, BitmapInterpolationMode.Linear);
 			}
 			renderTarget.EndDraw();
 		}
