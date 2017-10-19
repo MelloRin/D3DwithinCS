@@ -71,10 +71,7 @@ namespace MelloRin.CSd3d
 			leftMsPerFPS -= msPerFPS;
 
 			renderTimer = new Stopwatch();
-			timer = new Timer
-			{
-				Interval = 1000
-			};
+			timer = new Timer { Interval = 1000 };
 			timer.Elapsed += new ElapsedEventHandler((sender, e) =>
 			{
 				font.modString("fps", text: frame + " fps");

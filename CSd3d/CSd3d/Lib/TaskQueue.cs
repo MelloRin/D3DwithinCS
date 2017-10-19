@@ -1,10 +1,5 @@
 ﻿namespace MelloRin.CSd3d.Lib
 {
-	public interface ITask
-	{
-		void run();
-	}
-
 	public class TaskQueue
 	{
 		private QueueData head = null;

@@ -72,9 +72,11 @@
     <Compile Include="D3Dhandler.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="Lib\FontData.cs" />
+    <Compile Include="Lib\Interfaces.cs" />
     <Compile Include="Lib\PublicData_manager.cs" />
     <Compile Include="Lib\Savedata_manager.cs" />
     <Compile Include="Lib\Setting_manager.cs" />
+    <Compile Include="Lib\SpriteData.cs" />
     <Compile Include="Lib\TaskQueue.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>

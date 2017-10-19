@@ -31,6 +31,7 @@ namespace MelloRin.CSd3d
 
 			MouseClick += new MouseEventHandler((object sender, MouseEventArgs e) =>
 			{
+				Console.WriteLine("{0},{1}", e.X, e.Y);
 				foreach (string i in D2DSprite._LSprite.Keys)
 				{
 					SpriteData seekTarget = D2DSprite._LSprite[i];

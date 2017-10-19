@@ -73,6 +73,8 @@ namespace server
 
 		static void Main(string[] args)
 		{
+			Console.WriteLine("DBConnected...");
+
 			try
 			{
 				Socket socket = socketBinder();
@@ -94,8 +96,8 @@ namespace server
                     byte[] send = Encoding.UTF8.GetBytes(echo);
 
                     accepted.Send(send);
-					socket.Close();
-                    */
+					socket.Close();*/
+                    
 				}
 
 			}

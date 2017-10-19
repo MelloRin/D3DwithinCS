@@ -5,7 +5,7 @@ using System.Text;
 
 namespace MelloRin.FileManager
 {
-	class AES256_manager
+	public class AES256_manager
 	{
 		public static string decrypt(string Input, string key)
 		{
