@@ -1,7 +1,7 @@
 ﻿namespace MelloRin.CSd3d.Lib
 {
 	public class ListData { }
-
+	
 	public interface IListable
 	{
 		void add(string tag, ListData data);
@@ -16,6 +16,6 @@
 
 	public interface ITask
 	{
-		void run();
+		void run(TaskQueue taskQueue);
 	}
 }

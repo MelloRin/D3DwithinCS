@@ -1,33 +1,35 @@
-﻿using System;
-
-using Bitmap = SharpDX.Direct2D1.Bitmap;
+﻿using SharpDX.Direct2D1;
+using System;
 
 namespace MelloRin.CSd3d.Lib
 {
 	public class SpriteData : ListData, IDisposable
 	{
-		public int x { get; private set; }
-		public int y { get; private set; }
+		public int x;
+		public int y;
 		public int priority { get; private set; }
-		public Bitmap bitmap { get; private set; }
+
+		public BitmapBrush bitmapBrush { get; private set; }
 
 		public event EventHandler OnMouseClick;
 
-		public SpriteData(Bitmap bitmap, int x, int y, int priority)
+		public SpriteData(BitmapBrush bitmapBrush, int x, int y, int priority)
 		{
 			this.x = x;
 			this.y = y;
 
-			this.bitmap = bitmap;
+			this.bitmapBrush = bitmapBrush;
 
 			this.priority = priority;
 		}
 
+
+
 		public void collisionCheck(int pointX, int pointY)
 		{
-			if (pointX >= x && pointX <= x + (int)bitmap.Size.Width)
+			if (pointX >= x && pointX <= x + (int)bitmapBrush.Bitmap.Size.Width)
 			{
-				if (pointY >= y && pointY <= y + (int)bitmap.Size.Height)
+				if (pointY >= y && pointY <= y + (int)bitmapBrush.Bitmap.Size.Height)
 				{
 					OnMouseClick?.Invoke(null, null);
 				}
@@ -36,8 +38,8 @@ namespace MelloRin.CSd3d.Lib
 
 		public void Dispose()
 		{
-			if (bitmap != null)
-				bitmap.Dispose();
+			if (bitmapBrush != null)
+				bitmapBrush.Dispose();
 			if (OnMouseClick != null)
 				OnMouseClick = null;
 		}

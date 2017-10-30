@@ -4,14 +4,15 @@ using SharpDX.Direct3D11;
 using SharpDX.DXGI;
 using SharpDX.Mathematics.Interop;
 using System;
-using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace MelloRin.CSd3d
 {
 	public class D2DFont : IDisposable, IDrawable, IListable
 	{
 		public RenderTarget renderTarget { get; private set; }
-		private ConcurrentDictionary<string, FontData> _Ldraw = new ConcurrentDictionary<string, FontData>();
+		private Dictionary<string, FontData> _Ldraw = new Dictionary<string, FontData>();
 
 		static public D2DSprite test;
 
@@ -33,7 +34,7 @@ namespace MelloRin.CSd3d
 			}
 			else
 			{
-				_Ldraw.TryAdd(tag, (FontData)data);
+				_Ldraw.Add(tag, (FontData)data);
 			}
 		}
 
@@ -41,7 +42,7 @@ namespace MelloRin.CSd3d
 		{
 			if (_Ldraw.ContainsKey(tag))
 			{
-				_Ldraw.TryRemove(tag, out FontData temp);
+				_Ldraw.Remove(tag);
 			}
 		}
 
@@ -65,7 +66,7 @@ namespace MelloRin.CSd3d
 		{
 			renderTarget.BeginDraw();
 
-			foreach (string key in _Ldraw.Keys)
+			foreach (string key in _Ldraw.Keys.ToArray())
 			{
 				FontData drawTarget = _Ldraw[key];
 				renderTarget.DrawText(drawTarget.text, drawTarget._directWriteTextFormat, new RawRectangleF(drawTarget.x, drawTarget.y, float.Parse(PublicData_manager.settings.get_setting("width")) , float.Parse(PublicData_manager.settings.get_setting("width"))), drawTarget._directWriteFontColor);
@@ -75,7 +76,7 @@ namespace MelloRin.CSd3d
 
 		public void Dispose()
 		{
-			foreach (string key in _Ldraw.Keys)
+			foreach (string key in _Ldraw.Keys.ToArray())
 			{
 				FontData drawTarget = _Ldraw[key];
 

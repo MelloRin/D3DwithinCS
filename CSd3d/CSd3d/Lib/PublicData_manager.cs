@@ -8,5 +8,7 @@
         public static Savedata_manager score = null;
 
 		public static TaskQueue currentTaskQueue = new TaskQueue();
+
+		public static bool mouseCaptureState = true;
 	}
 }

@@ -4,6 +4,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+
 using DataSet = System.Data.DataSet;
 
 namespace server
@@ -24,7 +25,7 @@ namespace server
 
 		static private string dbConnect(string uuid, string token)
 		{
-			string strDBConn = "Server=localhost;Database=capstoneserver;Uid=root;Pwd=rpavpdls3;";
+			string strDBConn = "Server=rpapdlssla.0pe.kr;Database=capstoneserver;Uid=root;Pwd=rpavpdls3;";
 			MySqlConnection dbConn = new MySqlConnection(strDBConn);
 			dbConn.Open();
 
@@ -53,9 +54,9 @@ namespace server
 			return uuid;
 		}
 
-		static void _task(Socket sock)
+		static void _Ttask(Socket sock)
 		{
-			byte[] Buffer = new byte[sock.SendBufferSize];
+			byte[] Buffer = new byte[sock.ReceiveBufferSize];
 			int bytesRead = sock.Receive(Buffer);
 
 			byte[] formatted = new byte[bytesRead];
@@ -67,14 +68,11 @@ namespace server
 			}
 
 			string received = Encoding.UTF8.GetString(formatted);
-			Console.WriteLine(received);
 			sock.Close();
 		}
 
 		static void Main(string[] args)
 		{
-			Console.WriteLine("DBConnected...");
-
 			try
 			{
 				Socket socket = socketBinder();
@@ -83,7 +81,7 @@ namespace server
 					socket.Listen(10);
 					Socket accepted = socket.Accept();
 
-					Thread _Tsocket = new Thread(() => _task(accepted));
+					Thread _Tsocket = new Thread(() => _Ttask(accepted));
 					_Tsocket.Start();
 
 					/*

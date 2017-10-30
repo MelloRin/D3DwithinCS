@@ -29,7 +29,7 @@
 				QueueData temp = head;
 				head = temp.getNext();
 
-				temp.task.run();
+				temp.task.run(this);
 				running = false;
 			}
 			else
@@ -39,7 +39,7 @@
 				{
 					temp = temp.getNext();
 				}
-				temp.setNext(new QueueData(data));
+				temp.setNext(new QueueData(data)); 
 			}
 		}
 
@@ -52,7 +52,7 @@
 				QueueData temp = head;
 				head = temp.getNext();
 
-				temp.task.run();
+				temp.task.run(this);
 				running = false;
 			}
 		}

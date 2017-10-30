@@ -8,7 +8,6 @@ using SharpDX.Windows;
 using System;
 using System.Collections.Concurrent;
 using System.Diagnostics;
-using System.IO;
 using System.Threading;
 using System.Timers;
 using System.Windows.Forms;
@@ -18,7 +17,13 @@ using Timer = System.Timers.Timer;
 
 namespace MelloRin.CSd3d
 {
-	class D3Dhandler : IDisposable, ITask
+	public class RenderTaskerHandler
+	{
+		public D2DFont font { get; protected set; }
+		public D2DSprite sprite { get; protected set; }
+	}
+
+	class D3Dhandler : RenderTaskerHandler, IDisposable, ITask
 	{
 		#region field members
 		//form
@@ -30,32 +35,15 @@ namespace MelloRin.CSd3d
 		private RenderTargetView _backbufferView;
 		private DepthStencilView _zbufferView;
 		private DeviceContext _deviceContext;
-
 		private Texture2D _backBufferTexture;
-		public D2DFont font { get; private set; }
-		public D2DSprite sprite { get; private set; }
-
 		private SwapChainDescription desc;
 
 		//rendertask
 		private ConcurrentDictionary<string, Action> _Ltask = new ConcurrentDictionary<string, Action>();
-		//private Action[] task;
 
-		//vsync
-		private readonly int targetFPS = 60;
-
-		private Stopwatch renderTimer;
 		private Timer timer;
 
-		private int msPerFPS;
-		private long nextRenderStartTime;
-		private double leftMsPerFPS;
-		private double leftMs = 0d;
-
-		private int sleepTime;
-
 		private int frame = 0;
-		private StreamWriter writer = new StreamWriter("log.txt");
 
 		//background
 		private bool b_up = false;
@@ -65,12 +53,7 @@ namespace MelloRin.CSd3d
 		public D3Dhandler(RenderForm mainForm)
 		{
 			targetForm = mainForm;
-			//msPerFPS = 1000 / targetFPS;
-			leftMsPerFPS = 1000f / targetFPS;
-			msPerFPS = (int)leftMsPerFPS;
-			leftMsPerFPS -= msPerFPS;
 
-			renderTimer = new Stopwatch();
 			timer = new Timer { Interval = 1000 };
 			timer.Elapsed += new ElapsedEventHandler((sender, e) =>
 			{
@@ -81,32 +64,22 @@ namespace MelloRin.CSd3d
 			});
 		}
 
-		public void run()
+		public void run(TaskQueue taskQueue)
 		{
 			createDevice();
 
 			Thread _Td3d = new Thread(() =>
 			{
 				timer.Start();
-				renderTimer.Start();
-				//Clear(new RawColor4(0, 0, 0, 1));
-
-				/*_Ltask.TryAdd("background", background_Render);
-				_Ltask.TryAdd("font", font.draw);
-				task = new Action[_Ltask.Count];
-				_Ltask.Values.CopyTo(task, 0);*/
 
 				while (targetForm.Created)
 				{
-					nextRenderStartTime = renderTimer.ElapsedMilliseconds + msPerFPS;
-
 					try
 					{
-						background_Render();
+						//background_Render();
+						Clear(new RawColor4(0, 0, 0, 1));
 						font.draw();
 						sprite.draw();
-
-						//Parallel.Invoke(task);
 
 						Present();
 						++frame;
@@ -116,48 +89,12 @@ namespace MelloRin.CSd3d
 						Console.WriteLine("D3D 에러" + e.ToString());
 						return;
 					}
-
-					if (leftMs >= 1d)
-					{
-						int errorCorrect = (int)leftMs;
-						nextRenderStartTime += errorCorrect;
-						leftMs -= errorCorrect;
-					}
-
-					leftMs += leftMsPerFPS;
-					sleepTime = (int)(nextRenderStartTime - renderTimer.ElapsedMilliseconds);
-					//writer.WriteLine("{0}ms Sleep", sleepTime);
-					if (sleepTime > 0)
-					{
-						Thread.Sleep(sleepTime);
-					}
 				}
-				writer.Close();
 				Dispose();
 			});
 			_Td3d.Start();
 
-			PublicData_manager.currentTaskQueue.runNext();
-		}
-
-		private void constructing()
-		{
-			/*Dictionary<string,Action> list = new Dictionary<string, Action>();
-
-			ConcurrentDictionary<string, int> test = new ConcurrentDictionary<string, int>();
-
-			Thread[] thread = new Thread[10];
-			Thread _Ttest = new Thread(() =>
-			{
-
-
-			});
-
-			list.Add("asdf",temp);
-
-			Action[] action = new Action[list.Count];
-			list.Values.CopyTo(action, 0);
-			Parallel.Invoke(action);*/
+			taskQueue.runNext();
 		}
 
 		private void createDevice()
@@ -166,7 +103,7 @@ namespace MelloRin.CSd3d
 			{
 				desc = new SwapChainDescription()
 				{
-					BufferCount = 1,//buffer count
+					BufferCount = 2,//buffer count
 					ModeDescription = new ModeDescription(targetForm.ClientSize.Width, targetForm.ClientSize.Height, new Rational(60, 1), Format.R8G8B8A8_UNorm),//sview
 					IsWindowed = Boolean.Parse(PublicData_manager.settings.get_setting("windowded")),
 					OutputHandle = targetForm.Handle,
@@ -175,7 +112,7 @@ namespace MelloRin.CSd3d
 					Usage = Usage.RenderTargetOutput
 				};
 			}));
-
+			
 			FeatureLevel[] levels = new FeatureLevel[] { FeatureLevel.Level_11_0 };
 			DeviceCreationFlags flag = DeviceCreationFlags.None | DeviceCreationFlags.BgraSupport;
 
@@ -185,17 +122,11 @@ namespace MelloRin.CSd3d
 
 			_backBufferTexture = _swapChain.GetBackBuffer<Texture2D>(0);
 			font = new D2DFont(_backBufferTexture);
-			//font.add("tittle", new FontData("Hello SharpDX", font.renderTarget, Color.White));
-
 			font.add("fps", new FontData(frame + " fps", font.renderTarget, Color.White));
-			font.add("nowTime", new FontData("Current Time " + DateTime.Now.ToString(), font.renderTarget, Color.Red, 0, 32));
-
-			string imageSrc = String.Format("{0}\\res\\sprite\\{1}", Directory.GetCurrentDirectory(), "note_blue.png");
 			sprite = new D2DSprite(_backBufferTexture);
 
-			sprite.add("note", new SpriteData(D2DSprite.makeBitmap(sprite.renderTarget, imageSrc), 300, 300, 1));
-
 			_backbufferView = new RenderTargetView(_device, _backBufferTexture);
+
 			_backBufferTexture.Dispose();
 
 			var _zbufferTexture = new Texture2D(_device, new Texture2DDescription()
@@ -211,7 +142,7 @@ namespace MelloRin.CSd3d
 				CpuAccessFlags = CpuAccessFlags.None,
 				OptionFlags = ResourceOptionFlags.None
 			});
-
+			
 			// Create the depth buffer view
 			_zbufferView = new DepthStencilView(_device, _zbufferTexture);
 			_zbufferTexture.Dispose();
@@ -247,7 +178,7 @@ namespace MelloRin.CSd3d
 			_deviceContext.ClearDepthStencilView(_zbufferView, DepthStencilClearFlags.Depth, 1.0F, 0);
 		}
 
-		private void Present() { _swapChain.Present(0, PresentFlags.None); }
+		private void Present() { _swapChain.Present(1, PresentFlags.None); }
 
 
 		public void Dispose()
@@ -258,8 +189,27 @@ namespace MelloRin.CSd3d
 				font.Dispose();
 			if (timer != null)
 				timer.Dispose();
-			if (renderTimer != null)
-				renderTimer = null;
 		}
 	}
 }
+
+
+/*private void constructing()
+{
+	Dictionary<string,Action> list = new Dictionary<string, Action>();
+
+	ConcurrentDictionary<string, int> test = new ConcurrentDictionary<string, int>();
+
+	Thread[] thread = new Thread[10];
+	Thread _Ttest = new Thread(() =>
+	{
+
+
+	});
+
+	list.Add("asdf",temp);
+
+	Action[] action = new Action[list.Count];
+	list.Values.CopyTo(action, 0);
+	Parallel.Invoke(action);
+}*/

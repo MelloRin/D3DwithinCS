@@ -11,6 +11,8 @@ namespace MelloRin.CSd3d
 	class MainForm : RenderForm, ITask
 	{
 		private bool[] keyInputList = new bool[Setting_manager.input_keys_key.Length];
+		private bool escInputState = false;
+
 		public MainForm()
 		{
 			AutoScaleDimensions = new SizeF(7F, 12F);
@@ -41,28 +43,53 @@ namespace MelloRin.CSd3d
 
 			MaximizeBox = false;
 			Icon = null;
-			Text = "Test";
+			Text = "BEATmaker";
 		}
 
-		public void run()
+		public void run(TaskQueue taskQueue)
 		{
 			Thread _TmainThread = new Thread(() =>
 			{
 				Show();
+
+				Application.DoEvents();
+				//Cursor = new Cursor(Cursor.Current.Handle);
+				Cursor.Hide();
+				Point center = new Point(DesktopLocation.X + Width / 2, (DesktopLocation.Y + 32) + Height / 2);
+
 				while (Created)
 				{
 					Application.DoEvents();
+
+					if (Cursor.Position != center && PublicData_manager.mouseCaptureState && Focused)
+					{
+						Cursor.Position = center;
+					}
+
 					Thread.Sleep(2);
 				}
 			});
 
 			_TmainThread.Start();
-			PublicData_manager.currentTaskQueue.runNext();
+			taskQueue.runNext();
 		}
 
 		private void _EkeyDown(object sender, KeyEventArgs e)
 		{
 			string input = e.KeyCode.ToString().ToLower();
+
+			if (e.KeyCode == Keys.Escape && !escInputState)
+			{
+				escInputState = true;
+
+				if (!PublicData_manager.mouseCaptureState)
+					Cursor.Hide();
+				else
+					Cursor.Show();
+
+				PublicData_manager.mouseCaptureState = !PublicData_manager.mouseCaptureState;
+			}
+
 
 			if (PublicData_manager.settings.input_key_search(input))
 			{
@@ -92,6 +119,11 @@ namespace MelloRin.CSd3d
 		private void _EkeyUp(object sender, KeyEventArgs e)
 		{
 			string input = e.KeyCode.ToString().ToLower();
+
+			if (e.KeyCode == Keys.Escape && escInputState)
+			{
+				escInputState = false;
+			}
 
 			if (PublicData_manager.settings.input_key_search(input))
 			{
