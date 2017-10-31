@@ -1,6 +1,9 @@
 ﻿namespace MelloRin.CSd3d.Lib
 {
-	public class ListData { }
+	public class ListData
+	{
+		public int x, y;
+	}
 	
 	public interface IListable
 	{

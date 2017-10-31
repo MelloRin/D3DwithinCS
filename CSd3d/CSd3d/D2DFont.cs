@@ -69,7 +69,7 @@ namespace MelloRin.CSd3d
 			foreach (string key in _Ldraw.Keys.ToArray())
 			{
 				FontData drawTarget = _Ldraw[key];
-				renderTarget.DrawText(drawTarget.text, drawTarget._directWriteTextFormat, new RawRectangleF(drawTarget.x, drawTarget.y, float.Parse(PublicData_manager.settings.get_setting("width")) , float.Parse(PublicData_manager.settings.get_setting("width"))), drawTarget._directWriteFontColor);
+				renderTarget.DrawText(drawTarget.text, drawTarget._directWriteTextFormat, new RawRectangleF(drawTarget.x, drawTarget.y, float.Parse(PublicDataManager.settings.getSetting("width")) , float.Parse(PublicDataManager.settings.getSetting("width"))), drawTarget._directWriteFontColor);
 			}
 			renderTarget.EndDraw();
 		}

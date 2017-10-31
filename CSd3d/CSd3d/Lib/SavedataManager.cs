@@ -5,24 +5,24 @@ using DataSet = MelloRin.FileManager.DataSet;
 
 namespace MelloRin.CSd3d.Lib
 {
-    public class Savedata_manager
+    public class SaveDataManager
     {
         private Hashtable scoreTable = new Hashtable();
         public Hashtable getScoretable() => scoreTable;
 
-        public static readonly string[] music_name = new string[] { "a", "b", "c" };
+        public static readonly string[] musicName = new string[] { "a", "b", "c" };
 
-        public Savedata_manager(DataSet dataSet)
+        public SaveDataManager(DataSet dataSet)
         {
             try
             {
-                scoreTable = dataSet.getdata("Score");
+                scoreTable = dataSet.getData("Score");
             }
             catch (DatasetException)
             {
-				for (int i = 0; i < music_name.Length; i++) 
+				for (int i = 0; i < musicName.Length; i++) 
                 {
-					scoreTable.Add(music_name[i], i);
+					scoreTable.Add(musicName[i], i);
                 }
             }
         }

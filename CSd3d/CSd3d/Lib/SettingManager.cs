@@ -6,7 +6,7 @@ using DataSet = MelloRin.FileManager.DataSet;
 
 namespace MelloRin.CSd3d.Lib
 {
-    public class Setting_manager
+    public class SettingManager
     {
         private Hashtable settings = new Hashtable();
         private Hashtable inputKeys = new Hashtable();
@@ -14,23 +14,23 @@ namespace MelloRin.CSd3d.Lib
         public Hashtable getDisplaytable() => settings;
         public Hashtable getKeytable() => inputKeys;
 
-        public static readonly string[] settings_key = new string[] { "width", "height", "windowded" };
-        public static readonly string[] input_keys_key = new string[] { "up", "down", "left", "right" };
+        public static readonly string[] settingsKey = new string[] { "width", "height", "windowded" };
+        public static readonly string[] inputKeysKey = new string[] { "up", "down", "left", "right" };
 
-        public Setting_manager(DataSet dataSet)
+        public SettingManager(DataSet dataSet)
         {
             try
             {
-                settings = dataSet.getdata("Display");
-                inputKeys = dataSet.getdata("Input");
+                settings = dataSet.getData("Display");
+                inputKeys = dataSet.getData("Input");
             }
             catch (DatasetException)
             {
-                set_default_settings();
+                setDefaultSettings();
             }
         }
 
-        public string get_setting(string key) => settings[key].ToString();
+        public string getSetting(string key) => settings[key].ToString();
         public void configSetting(string key, string value)
         {
             if (settings.ContainsKey(key))
@@ -40,8 +40,8 @@ namespace MelloRin.CSd3d.Lib
             }
         }
 
-        public string get_input_keys(string key) => inputKeys[key].ToString();
-        public bool input_key_search(string value) => inputKeys.ContainsValue(value);
+        public string getInputKeys(string key) => inputKeys[key].ToString();
+        public bool inputKeySearch(string value) => inputKeys.ContainsValue(value);
         public void configInputKeys(string key, string value)
         {
             if (inputKeys.ContainsKey(key))
@@ -50,7 +50,7 @@ namespace MelloRin.CSd3d.Lib
             }
         }
 
-        private void set_default_settings()
+        private void setDefaultSettings()
         {
             settings.Add("width", "1280");
             settings.Add("height", "720");

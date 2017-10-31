@@ -105,7 +105,7 @@ namespace MelloRin.CSd3d
 				{
 					BufferCount = 2,//buffer count
 					ModeDescription = new ModeDescription(targetForm.ClientSize.Width, targetForm.ClientSize.Height, new Rational(60, 1), Format.R8G8B8A8_UNorm),//sview
-					IsWindowed = Boolean.Parse(PublicData_manager.settings.get_setting("windowded")),
+					IsWindowed = Boolean.Parse(PublicDataManager.settings.getSetting("windowded")),
 					OutputHandle = targetForm.Handle,
 					SampleDescription = new SampleDescription(1, 0),
 					SwapEffect = SwapEffect.Discard,
@@ -134,8 +134,8 @@ namespace MelloRin.CSd3d
 				Format = Format.D16_UNorm,
 				ArraySize = 1,
 				MipLevels = 1,
-				Width = Int32.Parse(PublicData_manager.settings.get_setting("width")),
-				Height = Int32.Parse(PublicData_manager.settings.get_setting("height")),
+				Width = Int32.Parse(PublicDataManager.settings.getSetting("width")),
+				Height = Int32.Parse(PublicDataManager.settings.getSetting("height")),
 				SampleDescription = new SampleDescription(1, 0),
 				Usage = ResourceUsage.Default,
 				BindFlags = BindFlags.DepthStencil,
@@ -150,7 +150,7 @@ namespace MelloRin.CSd3d
 			_deviceContext.Rasterizer.SetViewport(0, 0, targetForm.ClientSize.Width, targetForm.ClientSize.Height);
 			_deviceContext.OutputMerger.SetTargets(_zbufferView, _backbufferView);
 
-			PublicData_manager.device_created = true;
+			PublicDataManager.deviceCreated = true;
 		}
 
 		private void background_Render()

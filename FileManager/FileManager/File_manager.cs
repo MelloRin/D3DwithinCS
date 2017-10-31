@@ -6,14 +6,14 @@ namespace MelloRin.FileManager
 {
 	public class File_manager
 	{
-		private static readonly string saveFile_name = "savedata.mlr";
+		private static readonly string saveFileName = "savedata.mlr";
 		private DataSet dataSet = new DataSet();
 
-		public static bool load_data(out DataSet dataSet)
+		public static bool loadData(out DataSet dataSet)
 		{
-			if (File.Exists(saveFile_name))
+			if (File.Exists(saveFileName))
 			{
-				StreamReader reader = new StreamReader(saveFile_name);
+				StreamReader reader = new StreamReader(saveFileName);
 
 				string rawData = reader.ReadLine();
 				reader.Close();
@@ -37,7 +37,7 @@ namespace MelloRin.FileManager
 							data = new Hashtable();
 						else
 						{
-							dataSet.adddata(tag, data);
+							dataSet.addData(tag, data);
 							data = new Hashtable();
 						}
 
@@ -53,7 +53,7 @@ namespace MelloRin.FileManager
 					}
 					catch (IndexOutOfRangeException) { }
 				}
-				dataSet.adddata(tag, data);
+				dataSet.addData(tag, data);
 			}
 			else
 			{
@@ -63,11 +63,11 @@ namespace MelloRin.FileManager
 			return true;
 		}
 
-		public static bool save_data(DataSet dataSet)
+		public static bool saveData(DataSet dataSet)
 		{
-			if (File.Exists(saveFile_name))
+			if (File.Exists(saveFileName))
 			{
-				File.Delete(saveFile_name);
+				File.Delete(saveFileName);
 			}
 
 			Guid guid = Guid.NewGuid();
@@ -81,10 +81,10 @@ namespace MelloRin.FileManager
 			}
 
 			string raw_data = "";
-			foreach (string tag_key in dataSet.getdataKey())
+			foreach (string tag_key in dataSet.getDataKey())
 			{
 				raw_data += String.Format("[{0}]\n", tag_key);
-				Hashtable data = dataSet.getdata(tag_key);
+				Hashtable data = dataSet.getData(tag_key);
 
 				foreach (object key in data.Keys)
 				{
@@ -93,7 +93,7 @@ namespace MelloRin.FileManager
 			}
 			string output = String.Format("{0}{1}", uuid, AES256_manager.encrypt(raw_data, uuid));
 
-			StreamWriter writer = new StreamWriter(saveFile_name);
+			StreamWriter writer = new StreamWriter(saveFileName);
 			writer.Write(output);
 			writer.Close();
 

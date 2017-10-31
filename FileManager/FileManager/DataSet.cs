@@ -7,7 +7,7 @@ namespace MelloRin.FileManager
 	{
 		private Dictionary<string, Hashtable> dataSet = new Dictionary<string, Hashtable>();
 
-		public Hashtable getdata(string key)
+		public Hashtable getData(string key)
 		{
 			try
 			{
@@ -19,8 +19,8 @@ namespace MelloRin.FileManager
 			}
 		}
 
-		public void adddata(string key, Hashtable data) => dataSet.Add(key, data);
+		public void addData(string key, Hashtable data) => dataSet.Add(key, data);
 
-		public Dictionary<string, Hashtable>.KeyCollection getdataKey() => dataSet.Keys;
+		public Dictionary<string, Hashtable>.KeyCollection getDataKey() => dataSet.Keys;
 	}
 }

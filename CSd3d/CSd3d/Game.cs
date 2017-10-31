@@ -55,16 +55,16 @@ namespace MelloRin.CSd3d
 			}
 		}
 
-		private void _Eeffect(object sender,ElapsedEventArgs e)
+		private void _Eeffect(object sender, ElapsedEventArgs e)
 		{
-			switch(noteEffectRunningFrame)
+			switch (noteEffectRunningFrame)
 			{
 				case 0:
 					drawer.sprite.modPoint("effect1", 400, 480);
 					break;
 				case 1:
 					drawer.sprite.modPoint("effect2", 400, 480);
-					drawer.sprite.modPoint("effect1", 1280,	720);
+					drawer.sprite.modPoint("effect1", 1280, 720);
 					break;
 				case 2:
 					drawer.sprite.modPoint("effect3", 400, 480);
@@ -105,11 +105,11 @@ namespace MelloRin.CSd3d
 			drawer.sprite.add("note", new SpriteData(D2DSprite.makeBitmapBrush(drawer.sprite.renderTarget, "n3.png"), 400, 0, 1));
 			//effect point = 400,480
 
-			for(int i = 1; i <=7; ++i)
+			for (int i = 1; i <= 7; ++i)
 			{
-				drawer.sprite.add("effect" + i, new SpriteData(D2DSprite.makeBitmapBrush(drawer.sprite.renderTarget, String.Format("effect{0}.png",i)), 1280, 720, 2));
+				drawer.sprite.add("effect" + i, new SpriteData(D2DSprite.makeBitmapBrush(drawer.sprite.renderTarget, String.Format("effect{0}.png", i)), 1280, 720, 2));
 			}
-		
+
 			timer.Start();
 
 
@@ -132,7 +132,7 @@ namespace MelloRin.CSd3d
 
 					drawer.sprite.modPoint("note", 400, noteY + 1);
 
-					if (!PublicData_manager.device_created)
+					if (!PublicDataManager.deviceCreated)
 					{
 						gameRunning = false;
 					}
@@ -180,7 +180,7 @@ namespace MelloRin.CSd3d
 
 		private void keyProcss(Gamepad pad)
 		{
-			if (pad.Buttons.HasFlag(GamepadButtonFlags.A) && !keyFlag[5])
+			/*if (pad.Buttons.HasFlag(GamepadButtonFlags.A) && !keyFlag[5])
 			{
 				keyFlag[5] = true;
 				Console.WriteLine("A down");
@@ -197,7 +197,27 @@ namespace MelloRin.CSd3d
 			{
 				keyFlag[5] = false;
 				Console.WriteLine("A up");
+			}*/
+
+			if (pad.LeftTrigger >= 128 && !keyFlag[5])
+			{
+				keyFlag[5] = true;
+				Console.WriteLine("Left Tilt");
+
+				int noteY = D2DSprite._LSprite["note"].y;
+
+				if (noteY <= 530 && noteY >= 450)
+				{
+					noteY = 0;
+					noteEffectTimer.Start();
+				}
 			}
+			if (!(pad.LeftTrigger >= 128) && keyFlag[5])
+			{
+				keyFlag[5] = false;
+				
+			}
+
 
 
 

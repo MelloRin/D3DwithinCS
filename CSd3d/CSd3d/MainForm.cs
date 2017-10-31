@@ -10,7 +10,7 @@ namespace MelloRin.CSd3d
 {
 	class MainForm : RenderForm, ITask
 	{
-		private bool[] keyInputList = new bool[Setting_manager.input_keys_key.Length];
+		private bool[] keyInputList = new bool[SettingManager.inputKeysKey.Length];
 		private bool escInputState = false;
 
 		public MainForm()
@@ -19,8 +19,8 @@ namespace MelloRin.CSd3d
 			AutoScaleMode = AutoScaleMode.Font;
 			FormBorderStyle = FormBorderStyle.FixedSingle;
 
-			if (!UInt32.TryParse(PublicData_manager.settings.get_setting("width"), out uint width)
-			|| !UInt32.TryParse(PublicData_manager.settings.get_setting("height"), out uint height))
+			if (!UInt32.TryParse(PublicDataManager.settings.getSetting("width"), out uint width)
+			|| !UInt32.TryParse(PublicDataManager.settings.getSetting("height"), out uint height))
 			{
 				width = 1280;
 				height = 720;
@@ -61,7 +61,7 @@ namespace MelloRin.CSd3d
 				{
 					Application.DoEvents();
 
-					if (Cursor.Position != center && PublicData_manager.mouseCaptureState && Focused)
+					if (Cursor.Position != center && PublicDataManager.mouseCaptureState && Focused)
 					{
 						Cursor.Position = center;
 					}
@@ -82,33 +82,33 @@ namespace MelloRin.CSd3d
 			{
 				escInputState = true;
 
-				if (!PublicData_manager.mouseCaptureState)
+				if (!PublicDataManager.mouseCaptureState)
 					Cursor.Hide();
 				else
 					Cursor.Show();
 
-				PublicData_manager.mouseCaptureState = !PublicData_manager.mouseCaptureState;
+				PublicDataManager.mouseCaptureState = !PublicDataManager.mouseCaptureState;
 			}
 
 
-			if (PublicData_manager.settings.input_key_search(input))
+			if (PublicDataManager.settings.inputKeySearch(input))
 			{
-				if (input.Equals(PublicData_manager.settings.get_input_keys(Setting_manager.input_keys_key[0])) && !keyInputList[0])
+				if (input.Equals(PublicDataManager.settings.getInputKeys(SettingManager.inputKeysKey[0])) && !keyInputList[0])
 				{
 					Console.WriteLine("(UP)key DOWN");
 					keyInputList[0] = true;
 				}
-				if (input.Equals(PublicData_manager.settings.get_input_keys(Setting_manager.input_keys_key[1])) && !keyInputList[1])
+				if (input.Equals(PublicDataManager.settings.getInputKeys(SettingManager.inputKeysKey[1])) && !keyInputList[1])
 				{
 					Console.WriteLine("(DOWN)key DOWN");
 					keyInputList[1] = true;
 				}
-				if (input.Equals(PublicData_manager.settings.get_input_keys(Setting_manager.input_keys_key[2])) && !keyInputList[2])
+				if (input.Equals(PublicDataManager.settings.getInputKeys(SettingManager.inputKeysKey[2])) && !keyInputList[2])
 				{
 					Console.WriteLine("(LEFT)key DOWN");
 					keyInputList[2] = true;
 				}
-				if (input.Equals(PublicData_manager.settings.get_input_keys(Setting_manager.input_keys_key[3])) && !keyInputList[3])
+				if (input.Equals(PublicDataManager.settings.getInputKeys(SettingManager.inputKeysKey[3])) && !keyInputList[3])
 				{
 					Console.WriteLine("(RIGHT)key DOWN");
 					keyInputList[3] = true;
@@ -125,24 +125,24 @@ namespace MelloRin.CSd3d
 				escInputState = false;
 			}
 
-			if (PublicData_manager.settings.input_key_search(input))
+			if (PublicDataManager.settings.inputKeySearch(input))
 			{
-				if (input.Equals(PublicData_manager.settings.get_input_keys(Setting_manager.input_keys_key[0])))
+				if (input.Equals(PublicDataManager.settings.getInputKeys(SettingManager.inputKeysKey[0])))
 				{
 					Console.WriteLine("(UP)key UP");
 					keyInputList[0] = false;
 				}
-				if (input.Equals(PublicData_manager.settings.get_input_keys(Setting_manager.input_keys_key[1])))
+				if (input.Equals(PublicDataManager.settings.getInputKeys(SettingManager.inputKeysKey[1])))
 				{
 					Console.WriteLine("(DOWN)key UP");
 					keyInputList[1] = false;
 				}
-				if (input.Equals(PublicData_manager.settings.get_input_keys(Setting_manager.input_keys_key[2])))
+				if (input.Equals(PublicDataManager.settings.getInputKeys(SettingManager.inputKeysKey[2])))
 				{
 					Console.WriteLine("(LEFT)key UP");
 					keyInputList[2] = false;
 				}
-				if (input.Equals(PublicData_manager.settings.get_input_keys(Setting_manager.input_keys_key[3])))
+				if (input.Equals(PublicDataManager.settings.getInputKeys(SettingManager.inputKeysKey[3])))
 				{
 					Console.WriteLine("(RIGHT)key UP");
 					keyInputList[3] = false;
@@ -154,12 +154,12 @@ namespace MelloRin.CSd3d
 		{
 			DataSet dataSet = new DataSet();
 
-			dataSet.adddata("Display", PublicData_manager.settings.getDisplaytable());
-			dataSet.adddata("Input", PublicData_manager.settings.getKeytable());
-			dataSet.adddata("Score", PublicData_manager.score.getScoretable());
+			dataSet.addData("Display", PublicDataManager.settings.getDisplaytable());
+			dataSet.addData("Input", PublicDataManager.settings.getKeytable());
+			dataSet.addData("Score", PublicDataManager.score.getScoretable());
 
-			File_manager.save_data(dataSet);
-			PublicData_manager.device_created = false;
+			File_manager.saveData(dataSet);
+			PublicDataManager.deviceCreated = false;
 
 			Dispose(true);
 		}

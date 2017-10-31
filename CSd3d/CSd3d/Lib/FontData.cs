@@ -11,8 +11,6 @@ namespace MelloRin.CSd3d.Lib
 		private RenderTarget renderTarget;
 
 		public string text;
-		public int x;
-		public int y;
 
 		private Color fontColor;
 		private string fontName = "Calibri";

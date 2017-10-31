@@ -5,8 +5,6 @@ namespace MelloRin.CSd3d.Lib
 {
 	public class SpriteData : ListData, IDisposable
 	{
-		public int x;
-		public int y;
 		public int priority { get; private set; }
 
 		public BitmapBrush bitmapBrush { get; private set; }

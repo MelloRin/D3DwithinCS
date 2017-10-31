@@ -10,19 +10,19 @@ namespace MelloRin.CSd3d
 		[STAThread]
 		static void Main(string[] args)
 		{
-			File_manager.load_data(out DataSet dataSet);
+			File_manager.loadData(out DataSet dataSet);
 
 			Parallel.Invoke
 			(
-				() => { PublicData_manager.settings = new Setting_manager(dataSet); },
-				() => { PublicData_manager.score = new Savedata_manager(dataSet); }
+				() => { PublicDataManager.settings = new SettingManager(dataSet); },
+				() => { PublicDataManager.score = new SaveDataManager(dataSet); }
 			);
 
 			MainForm mainForm = new MainForm();
-			PublicData_manager.currentTaskQueue.addTask(mainForm);
+			PublicDataManager.currentTaskQueue.addTask(mainForm);
 			D3Dhandler drawer = new D3Dhandler(mainForm);
-			PublicData_manager.currentTaskQueue.addTask(drawer);
-			PublicData_manager.currentTaskQueue.addTask(new Game(drawer));
+			PublicDataManager.currentTaskQueue.addTask(drawer);
+			PublicDataManager.currentTaskQueue.addTask(new Game(drawer));
 		}
 	}
 }
