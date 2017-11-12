@@ -1,12 +1,12 @@
 ﻿using MelloRin.CSd3d.Lib;
 using NAudio.Wave;
 using SharpDX;
+using SharpDX.Direct2D1;
 using SharpDX.XInput;
 using System;
 using System.IO;
 using System.Threading;
 using System.Timers;
-using System.Windows.Forms;
 using Timer = System.Timers.Timer;
 
 namespace MelloRin.CSd3d
@@ -14,8 +14,14 @@ namespace MelloRin.CSd3d
 	class Game : ITask
 	{
 		static public bool gameRunning { get; private set; }
+
 		private RenderTaskerHandler drawer;
+		private BitmapBrush[] _LEffectSprite = new BitmapBrush[8];
+		private BitmapBrush[] _LScoreSprite = new BitmapBrush[10];
+
 		private Timer timer;
+
+
 
 		private Timer noteEffectTimer;
 		private int noteEffectRunningFrame = 0;
@@ -33,6 +39,7 @@ namespace MelloRin.CSd3d
 
 			timer = new Timer(1000);
 			timer.Elapsed += _Etimer;
+			 
 
 			noteEffectTimer = new Timer
 			{
@@ -57,42 +64,14 @@ namespace MelloRin.CSd3d
 
 		private void _Eeffect(object sender, ElapsedEventArgs e)
 		{
-			switch (noteEffectRunningFrame)
+			drawer.sprite.modImage("line1", _LEffectSprite[noteEffectRunningFrame]);
+
+			if (++noteEffectRunningFrame == _LEffectSprite.Length)
 			{
-				case 0:
-					drawer.sprite.modPoint("effect1", 400, 480);
-					break;
-				case 1:
-					drawer.sprite.modPoint("effect2", 400, 480);
-					drawer.sprite.modPoint("effect1", 1280, 720);
-					break;
-				case 2:
-					drawer.sprite.modPoint("effect3", 400, 480);
-					drawer.sprite.modPoint("effect2", 1280, 720);
-					break;
-				case 3:
-					drawer.sprite.modPoint("effect4", 400, 480);
-					drawer.sprite.modPoint("effect3", 1280, 720);
-					break;
-				case 4:
-					drawer.sprite.modPoint("effect5", 400, 480);
-					drawer.sprite.modPoint("effect4", 1280, 720);
-					break;
-				case 5:
-					drawer.sprite.modPoint("effect6", 400, 480);
-					drawer.sprite.modPoint("effect5", 1280, 720);
-					break;
-				case 6:
-					drawer.sprite.modPoint("effect7", 400, 480);
-					drawer.sprite.modPoint("effect6", 1280, 720);
-					break;
-				case 7:
-					drawer.sprite.modPoint("effect7", 1280, 720);
-					noteEffectRunningFrame = -1;
-					noteEffectTimer.Stop();
-					break;
+				noteEffectRunningFrame = 0;
+				noteEffectTimer.Stop();
 			}
-			++noteEffectRunningFrame;
+				
 		}
 
 		public void run(TaskQueue taskQueue)
@@ -102,14 +81,21 @@ namespace MelloRin.CSd3d
 
 			drawer.font.add("nowTime", new FontData("Current Time " + DateTime.Now.ToString(), drawer.font.renderTarget, Color.Red, 0, 32));
 
-			drawer.sprite.add("note", new SpriteData(D2DSprite.makeBitmapBrush(drawer.sprite.renderTarget, "n3.png"), 400, 0, 1));
+			drawer.sprite.add("note", new SpriteData(D2DSprite.makeBitmapBrush(drawer.sprite.renderTarget, "note-b.png"), 400, 0));
+
+			drawer.sprite.add("line1", new SpriteData(null, 400, 480));
 			//effect point = 400,480
 
 			for (int i = 1; i <= 7; ++i)
 			{
-				drawer.sprite.add("effect" + i, new SpriteData(D2DSprite.makeBitmapBrush(drawer.sprite.renderTarget, String.Format("effect{0}.png", i)), 1280, 720, 2));
+				_LEffectSprite[i-1] = D2DSprite.makeBitmapBrush(drawer.sprite.renderTarget, String.Format("effect-{0}.png", i));
 			}
+			_LEffectSprite[_LEffectSprite.Length-1] = D2DSprite.makeBitmapBrush(drawer.sprite.renderTarget, null,true);
 
+			for (int i = 0; i < 10; ++i)
+			{
+				_LScoreSprite[i] =  D2DSprite.makeBitmapBrush(drawer.sprite.renderTarget, String.Format("score-{0}.png", i));
+			}
 			timer.Start();
 
 
@@ -180,7 +166,7 @@ namespace MelloRin.CSd3d
 
 		private void keyProcss(Gamepad pad)
 		{
-			/*if (pad.Buttons.HasFlag(GamepadButtonFlags.A) && !keyFlag[5])
+			if (pad.Buttons.HasFlag(GamepadButtonFlags.A) && !keyFlag[5])
 			{
 				keyFlag[5] = true;
 				Console.WriteLine("A down");
@@ -197,11 +183,11 @@ namespace MelloRin.CSd3d
 			{
 				keyFlag[5] = false;
 				Console.WriteLine("A up");
-			}*/
+			}
 
-			if (pad.LeftTrigger >= 128 && !keyFlag[5])
+			if (pad.LeftTrigger >= 128 && !keyFlag[8])
 			{
-				keyFlag[5] = true;
+				keyFlag[8] = true;
 				Console.WriteLine("Left Tilt");
 
 				int noteY = D2DSprite._LSprite["note"].y;
@@ -212,9 +198,9 @@ namespace MelloRin.CSd3d
 					noteEffectTimer.Start();
 				}
 			}
-			if (!(pad.LeftTrigger >= 128) && keyFlag[5])
+			if (!(pad.LeftTrigger >= 128) && keyFlag[8])
 			{
-				keyFlag[5] = false;
+				keyFlag[8] = false;
 				
 			}
 
@@ -223,13 +209,6 @@ namespace MelloRin.CSd3d
 
 			/*if (pad.Buttons.HasFlag(GamepadButtonFlags.LeftShoulder) && !keyFlag[8])
 			{
-				if (!PublicData_manager.mouseCaptureState)
-					Cursor.Hide();
-				else
-					Cursor.Show();
-
-				PublicData_manager.mouseCaptureState = !PublicData_manager.mouseCaptureState;
-
 				Console.WriteLine("L 범퍼");
 				keyFlag[8] = true;
 			}

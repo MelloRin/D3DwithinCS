@@ -19,13 +19,13 @@ namespace MelloRin.CSd3d.Lib
 		public TextFormat _directWriteTextFormat { get; private set; }
 		public SolidColorBrush _directWriteFontColor { get; private set; }
 
-		public FontData(string text, RenderTarget renderTarget, Color fontColor, int targetX = 0, int targetY = 0,
+		public FontData(string text, RenderTarget renderTarget, Color fontColor, int x = 0, int y = 0,
 			int fontSize = 22, string fontName = "Calibri")
 		{
 			this.renderTarget = renderTarget;
 			this.text = text;
-			x = targetX;
-			y = targetY;
+			base.x = x;
+			base.y = y;
 
 			setFont(fontColor, fontName, fontSize);
 		}

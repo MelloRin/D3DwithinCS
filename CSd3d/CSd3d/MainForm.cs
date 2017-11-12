@@ -34,10 +34,10 @@ namespace MelloRin.CSd3d
 			MouseClick += new MouseEventHandler((object sender, MouseEventArgs e) =>
 			{
 				Console.WriteLine("{0},{1}", e.X, e.Y);
-				foreach (string i in D2DSprite._LSprite.Keys)
+				foreach (string i in D2DSprite._LClickableSprite.Keys)
 				{
-					SpriteData seekTarget = D2DSprite._LSprite[i];
-					seekTarget.collisionCheck(e.X, e.Y);
+					ClickableSprite seekTarget = D2DSprite._LClickableSprite[i];
+					seekTarget.pointCheck(e.X, e.Y);
 				}
 			});
 
@@ -54,17 +54,17 @@ namespace MelloRin.CSd3d
 
 				Application.DoEvents();
 				//Cursor = new Cursor(Cursor.Current.Handle);
-				Cursor.Hide();
-				Point center = new Point(DesktopLocation.X + Width / 2, (DesktopLocation.Y + 32) + Height / 2);
+				/*Cursor.Hide();
+				Point center = new Point(DesktopLocation.X + Width / 2, (DesktopLocation.Y + 32) + Height / 2);*/
 
 				while (Created)
 				{
 					Application.DoEvents();
 
-					if (Cursor.Position != center && PublicDataManager.mouseCaptureState && Focused)
+					/*if (Cursor.Position != center && PublicDataManager.mouseCaptureState && Focused)
 					{
 						Cursor.Position = center;
-					}
+					}*/
 
 					Thread.Sleep(2);
 				}

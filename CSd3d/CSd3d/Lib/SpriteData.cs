@@ -5,25 +5,35 @@ namespace MelloRin.CSd3d.Lib
 {
 	public class SpriteData : ListData, IDisposable
 	{
-		public int priority { get; private set; }
+		public BitmapBrush bitmapBrush { get; set; }
 
-		public BitmapBrush bitmapBrush { get; private set; }
+		public SpriteData(BitmapBrush bitmapBrush, int x, int y)
+		{
+			base.x = x;
+			base.y = y;
+
+			this.bitmapBrush = bitmapBrush;
+		}
+
+		public void Dispose()
+		{
+			if (bitmapBrush != null)
+				bitmapBrush.Dispose();
+		}
+	}
+
+	public class ClickableSprite : SpriteData
+	{
+		public int priority { get; private set; }
 
 		public event EventHandler OnMouseClick;
 
-		public SpriteData(BitmapBrush bitmapBrush, int x, int y, int priority)
+		public ClickableSprite(BitmapBrush bitmapBrush, int x, int y, int priority) : base(bitmapBrush, x, y)
 		{
-			this.x = x;
-			this.y = y;
-
-			this.bitmapBrush = bitmapBrush;
-
 			this.priority = priority;
 		}
 
-
-
-		public void collisionCheck(int pointX, int pointY)
+		public void pointCheck(int pointX, int pointY)
 		{
 			if (pointX >= x && pointX <= x + (int)bitmapBrush.Bitmap.Size.Width)
 			{
@@ -34,10 +44,9 @@ namespace MelloRin.CSd3d.Lib
 			}
 		}
 
-		public void Dispose()
+		new public void Dispose()
 		{
-			if (bitmapBrush != null)
-				bitmapBrush.Dispose();
+			base.Dispose();
 			if (OnMouseClick != null)
 				OnMouseClick = null;
 		}

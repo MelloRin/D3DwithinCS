@@ -7,7 +7,6 @@ using SharpDX.Mathematics.Interop;
 using SharpDX.Windows;
 using System;
 using System.Collections.Concurrent;
-using System.Diagnostics;
 using System.Threading;
 using System.Timers;
 using System.Windows.Forms;
@@ -57,8 +56,8 @@ namespace MelloRin.CSd3d
 			timer = new Timer { Interval = 1000 };
 			timer.Elapsed += new ElapsedEventHandler((sender, e) =>
 			{
-				font.modString("fps", text: frame + " fps");
-				font.modString("nowTime", text: "Current Time " + DateTime.Now.ToString());
+				font.modString("fps", frame + " fps");
+				font.modString("nowTime","Current Time " + DateTime.Now.ToString());
 
 				frame = 0;
 			});

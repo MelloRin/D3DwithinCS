@@ -16,12 +16,37 @@ namespace MelloRin.CSd3d
 	public class D2DSprite : IDisposable, IListable, IDrawable
 	{
 		public static ConcurrentDictionary<string, SpriteData> _LSprite = new ConcurrentDictionary<string, SpriteData>();
+		public static ConcurrentDictionary<string, ClickableSprite> _LClickableSprite = new ConcurrentDictionary<string, ClickableSprite>();
+
 		public RenderTarget renderTarget { get; private set; }
 
-		public static BitmapBrush makeBitmapBrush(RenderTarget renderTarget, string imgName)
+		public D2DSprite(Texture2D backBuffer)
+		{
+			var d2dFactory = new SharpDX.Direct2D1.Factory();
+			var d2dSurface = backBuffer.QueryInterface<Surface>();
+			renderTarget = new RenderTarget(d2dFactory, d2dSurface, new RenderTargetProperties(new SharpDX.Direct2D1.PixelFormat(Format.Unknown, SharpDX.Direct2D1.AlphaMode.Premultiplied)));
+
+			d2dSurface.Dispose();
+			d2dFactory.Dispose();
+		}
+
+		public static BitmapBrush makeBitmapBrush(RenderTarget renderTarget, string imgName, bool blankImage = false)
 		{
 			string imageSrc = String.Format(@"{0}\res\sprite\{1}", Directory.GetCurrentDirectory(), imgName);
 			FileInfo fileInfo = new FileInfo(imageSrc);
+
+			if(blankImage)
+			{
+				var pf = new SharpDX.Direct2D1.PixelFormat()
+				{
+					AlphaMode = SharpDX.Direct2D1.AlphaMode.Premultiplied,
+					Format = Format.B8G8R8A8_UNorm
+				};
+
+				BitmapRenderTarget pallete = new BitmapRenderTarget(renderTarget, CompatibleRenderTargetOptions.GdiCompatible,  pf);
+				return new BitmapBrush(renderTarget, pallete.Bitmap, new BitmapBrushProperties() { ExtendModeX = ExtendMode.Wrap, ExtendModeY = ExtendMode.Wrap });
+
+			}
 
 			if (fileInfo.Exists)
 			{
@@ -53,7 +78,7 @@ namespace MelloRin.CSd3d
 					AlphaMode = SharpDX.Direct2D1.AlphaMode.Premultiplied,
 					Format = Format.B8G8R8A8_UNorm
 				};
-				BitmapRenderTarget pallete = new BitmapRenderTarget(renderTarget, CompatibleRenderTargetOptions.GdiCompatible, new Size2F(20f, 20f), new Size2(1, 1), pf);
+				BitmapRenderTarget pallete = new BitmapRenderTarget(renderTarget, CompatibleRenderTargetOptions.GdiCompatible, new Size2F(30f, 30f), new Size2(1, 1), pf);
 
 				pallete.BeginDraw();
 				pallete.Clear(Color.Purple);
@@ -72,14 +97,29 @@ namespace MelloRin.CSd3d
 			}
 		}
 
-		public D2DSprite(Texture2D backBuffer)
+		public void modImage(string tag, BitmapBrush bitmapBrush)
 		{
-			var d2dFactory = new SharpDX.Direct2D1.Factory();
-			var d2dSurface = backBuffer.QueryInterface<Surface>();
-			renderTarget = new RenderTarget(d2dFactory, d2dSurface, new RenderTargetProperties(new SharpDX.Direct2D1.PixelFormat(Format.Unknown, SharpDX.Direct2D1.AlphaMode.Premultiplied)));
+			if (_LSprite.ContainsKey(tag))
+			{
+				_LSprite[tag].bitmapBrush = bitmapBrush;
+			}
+		}
 
-			d2dSurface.Dispose();
-			d2dFactory.Dispose();
+		public void draw()
+		{
+			renderTarget.BeginDraw();
+
+			foreach (string key in _LSprite.Keys)
+			{
+				SpriteData drawTarget = _LSprite[key];
+
+				if(_LSprite[key].bitmapBrush != null)
+				{
+					renderTarget.Transform = Matrix3x2.Translation(drawTarget.x, drawTarget.y);
+					renderTarget.FillRectangle(new RectangleF(0, 0, drawTarget.bitmapBrush.Bitmap.Size.Width, drawTarget.bitmapBrush.Bitmap.Size.Height), drawTarget.bitmapBrush);
+				}
+			}
+			renderTarget.EndDraw();
 		}
 
 		public void add(string tag, ListData data)
@@ -92,8 +132,19 @@ namespace MelloRin.CSd3d
 			{
 				_LSprite.TryAdd(tag, (SpriteData)data);
 			}
+		}
 
-			((SpriteData)data).OnMouseClick += (Object sender, EventArgs e) =>
+		public void addButton(string tag, ListData data)
+		{
+			if (_LClickableSprite.ContainsKey(tag))
+			{
+				_LClickableSprite[tag] = (ClickableSprite)data;
+			}
+			else
+			{
+				_LClickableSprite.TryAdd(tag, (ClickableSprite)data);
+			}
+			((ClickableSprite)data).OnMouseClick += (Object sender, EventArgs e) =>
 			{
 				Console.WriteLine("{0} 클릭됨.", tag);
 			};
@@ -107,19 +158,6 @@ namespace MelloRin.CSd3d
 			}
 		}
 
-		public void draw()
-		{
-			renderTarget.BeginDraw();
-
-			foreach (string key in _LSprite.Keys)
-			{
-				SpriteData drawTarget = _LSprite[key];
-
-				renderTarget.Transform = Matrix3x2.Translation(drawTarget.x, drawTarget.y);
-				renderTarget.FillRectangle(new RectangleF(0, 0, drawTarget.bitmapBrush.Bitmap.Size.Width, drawTarget.bitmapBrush.Bitmap.Size.Height), drawTarget.bitmapBrush);
-			}
-			renderTarget.EndDraw();
-		}
 
 		public void Dispose()
 		{
