@@ -53,7 +53,7 @@ namespace MelloRin.CSd3d
 		{
 			targetForm = mainForm;
 
-			timer = new Timer { Interval = 1000 };
+			timer = new Timer(1000d);
 			timer.Elapsed += new ElapsedEventHandler((sender, e) =>
 			{
 				font.modString("fps", frame + " fps");
@@ -76,7 +76,7 @@ namespace MelloRin.CSd3d
 					try
 					{
 						//background_Render();
-						Clear(new RawColor4(0, 0, 0, 1));
+						Clear(new RawColor4(0f, 0f, 0f, 1f));
 						font.draw();
 						sprite.draw();
 

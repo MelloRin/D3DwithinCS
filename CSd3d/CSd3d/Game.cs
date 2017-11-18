@@ -7,6 +7,7 @@ using System;
 using System.IO;
 using System.Threading;
 using System.Timers;
+
 using Timer = System.Timers.Timer;
 
 namespace MelloRin.CSd3d
@@ -21,12 +22,20 @@ namespace MelloRin.CSd3d
 
 		private Timer timer;
 
-
-
 		private Timer noteEffectTimer;
 		private int noteEffectRunningFrame = 0;
 
 		private int sec;
+
+		private int noteCount = 0;
+
+		private int totalNote = 30;
+		private int perfect = 0;
+		private int good = 0;
+		private int maxCombo = 0;
+		private int noteY;
+
+		Random r = new Random();
 
 		Controller controller = new Controller(UserIndex.One);
 		bool[] keyFlag = new bool[9];
@@ -37,14 +46,12 @@ namespace MelloRin.CSd3d
 
 			drawer.font.add("gamestate", new FontData("running", drawer.font.renderTarget, Color.YellowGreen, 100, 100, 30));
 
-			timer = new Timer(1000);
+			timer = new Timer(1000d);
 			timer.Elapsed += _Etimer;
-			 
 
-			noteEffectTimer = new Timer
-			{
-				Interval = 20
-			};
+
+			noteEffectTimer = new Timer(30d);
+
 			noteEffectTimer.Elapsed += _Eeffect;
 		}
 
@@ -71,7 +78,6 @@ namespace MelloRin.CSd3d
 				noteEffectRunningFrame = 0;
 				noteEffectTimer.Stop();
 			}
-				
 		}
 
 		public void run(TaskQueue taskQueue)
@@ -79,25 +85,9 @@ namespace MelloRin.CSd3d
 			sec = 0;
 			gameRunning = true;
 
-			drawer.font.add("nowTime", new FontData("Current Time " + DateTime.Now.ToString(), drawer.font.renderTarget, Color.Red, 0, 32));
+			loadImage();
 
-			drawer.sprite.add("note", new SpriteData(D2DSprite.makeBitmapBrush(drawer.sprite.renderTarget, "note-b.png"), 400, 0));
-
-			drawer.sprite.add("line1", new SpriteData(null, 400, 480));
-			//effect point = 400,480
-
-			for (int i = 1; i <= 7; ++i)
-			{
-				_LEffectSprite[i-1] = D2DSprite.makeBitmapBrush(drawer.sprite.renderTarget, String.Format("effect-{0}.png", i));
-			}
-			_LEffectSprite[_LEffectSprite.Length-1] = D2DSprite.makeBitmapBrush(drawer.sprite.renderTarget, null,true);
-
-			for (int i = 0; i < 10; ++i)
-			{
-				_LScoreSprite[i] =  D2DSprite.makeBitmapBrush(drawer.sprite.renderTarget, String.Format("score-{0}.png", i));
-			}
 			timer.Start();
-
 
 			Thread _Tgame = new Thread(() =>
 			{
@@ -108,15 +98,26 @@ namespace MelloRin.CSd3d
 						keyProcss(controller.GetState().Gamepad);
 					}
 
-					int noteY = D2DSprite._LSprite["note"].y;
-
-					if (noteY >= 530)
+					if(noteCount < totalNote)
 					{
-						noteY = 0;
-						//noteEffectTimer.Start();
+						noteY = D2DSprite._LSprite["note"].y;
+
+						if (noteY >= 550)
+						{
+							noteY = 0;
+							maxCombo = 0;
+							++noteCount;
+							Console.WriteLine("fail {0}",noteCount);
+							//noteEffectTimer.Start();
+						}
+
+						drawer.sprite.modPoint("note", 400, noteY + 1);
+					}
+					else
+					{
+						drawer.sprite.modPoint("note", 1280, 720);
 					}
 
-					drawer.sprite.modPoint("note", 400, noteY + 1);
 
 					if (!PublicDataManager.deviceCreated)
 					{
@@ -163,6 +164,32 @@ namespace MelloRin.CSd3d
 
 			taskQueue.runNext();
 		}
+		private void loadImage()
+		{
+			drawer.font.add("nowTime", new FontData("Current Time " + DateTime.Now.ToString(), drawer.font.renderTarget, Color.Red, 0, 32));
+
+			drawer.sprite.add("note", new SpriteData(D2DSprite.makeBitmapBrush(drawer.sprite.renderTarget, "note-b.png"), 400, 0));
+
+			drawer.sprite.add("line1", new SpriteData(null, 400, 480));
+
+			//effect point = 400,480
+
+			for (int i = 1; i <= 7; ++i)
+			{
+				_LEffectSprite[i - 1] = D2DSprite.makeBitmapBrush(drawer.sprite.renderTarget, String.Format("effect-{0}.png", i));
+			}
+			_LEffectSprite[_LEffectSprite.Length - 1] = D2DSprite.makeBitmapBrush(drawer.sprite.renderTarget, null, true);
+
+			for (int i = 0; i <= 9; ++i)
+			{
+				_LScoreSprite[i] = D2DSprite.makeBitmapBrush(drawer.sprite.renderTarget, String.Format("score-{0}.png", i));
+			}
+
+			for (int i = 1; i <= 7; ++i)
+			{
+				drawer.sprite.add(String.Format("score{0}", i), new SpriteData(_LScoreSprite[0], 1280 - (i * 55), 0));
+			}
+		}
 
 		private void keyProcss(Gamepad pad)
 		{
@@ -171,11 +198,15 @@ namespace MelloRin.CSd3d
 				keyFlag[5] = true;
 				Console.WriteLine("A down");
 
-				int noteY = D2DSprite._LSprite["note"].y;
-
-				if (noteY <= 520 && noteY >= 450)
+				if (noteY <= 525 && noteY >= 450)
 				{
-					noteY = 0;
+					Console.WriteLine("Perfect {0}", noteCount);
+					drawer.sprite.modPoint("note", 400, 1);
+					++noteCount;
+					++perfect;
+					++maxCombo;
+
+					scoreCalc();
 					noteEffectTimer.Start();
 				}
 			}
@@ -188,50 +219,69 @@ namespace MelloRin.CSd3d
 			if (pad.LeftTrigger >= 128 && !keyFlag[8])
 			{
 				keyFlag[8] = true;
-				Console.WriteLine("Left Tilt");
+				Console.WriteLine("UP Tilt");
 
-				int noteY = D2DSprite._LSprite["note"].y;
-
-				if (noteY <= 530 && noteY >= 450)
+				if (noteY <= 525 && noteY >= 450)
 				{
-					noteY = 0;
+					Console.WriteLine("Perfect {0}", noteCount);
+					drawer.sprite.modPoint("note", 400, 1);
+					++noteCount;
+					++perfect;
+					++maxCombo;
+
+					scoreCalc();
 					noteEffectTimer.Start();
 				}
 			}
 			if (!(pad.LeftTrigger >= 128) && keyFlag[8])
 			{
 				keyFlag[8] = false;
-				
+
 			}
 
-
-
-
-			/*if (pad.Buttons.HasFlag(GamepadButtonFlags.LeftShoulder) && !keyFlag[8])
+			if (pad.Buttons.HasFlag(GamepadButtonFlags.LeftShoulder) && !keyFlag[7])
 			{
 				Console.WriteLine("L 범퍼");
-				keyFlag[8] = true;
+				reset();
+				keyFlag[7] = true;
 			}
-			if (!pad.Buttons.HasFlag(GamepadButtonFlags.LeftShoulder) && keyFlag[8])
+			if (!pad.Buttons.HasFlag(GamepadButtonFlags.LeftShoulder) && keyFlag[7])
 			{
-				keyFlag[8] = false;
-			}*/
+				keyFlag[7] = false;
+			}
 		}
 
-		public void temp()
+		private void reset()
 		{
-			Random r = new Random();
-			//100만×Perfect횟수, 60만×Good횟수, 10만×맥스콤보 이 3개를 모두 더한 뒤 총 노트수만큼 나누고 소수점을 버림
-			for (int i = 0; i < 100; i++)
+			perfect = 0;
+			good = 0;
+			maxCombo = 0;
+			noteCount = 0;
+			scoreCalc();
+		}
+
+		//100만×Perfect횟수, 60만×Good횟수, 10만×맥스콤보 이 3개를 모두 더한 뒤 총 노트수만큼 나누고 소수점을 버림
+		private void scoreCalc()
+		{
+			double p = 1000000 * perfect;
+			double g = 600000 * good;
+			double max = 100000 * maxCombo;
+
+			updateScore((uint)((p + g + max) / totalNote));
+		}
+
+		object scoreLocker = new object();
+		private void updateScore(uint score)
+		{
+			lock(scoreLocker)
 			{
-				int max_note = 335;
-				int good_count = r.Next(1, 100);
+				string Sscore = String.Format("{0,7}", score);
+				Sscore = Sscore.Replace(" ", "0");
 
-				double p = 1000000 * (max_note - good_count);
-				double g = 600000 * good_count;
-				double max = 100000 * max_note;
-
-				uint total_score = (uint)((p + g + max) / max_note);
+				for (int i = 0; i < Sscore.Length; ++i)
+				{
+					drawer.sprite.modImage(String.Format("score{0}", (Sscore.Length) - i), _LScoreSprite[Int32.Parse(Sscore[i].ToString())]);
+				}
 			}
 		}
 	}

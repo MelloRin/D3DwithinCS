@@ -152,13 +152,13 @@ namespace MelloRin.CSd3d
 
 		private void _EformClosed(object sender, FormClosedEventArgs e)
 		{
-			DataSet dataSet = new DataSet();
+			SaveFileDataSet dataSet = new SaveFileDataSet();
 
 			dataSet.addData("Display", PublicDataManager.settings.getDisplaytable());
 			dataSet.addData("Input", PublicDataManager.settings.getKeytable());
 			dataSet.addData("Score", PublicDataManager.score.getScoretable());
 
-			File_manager.saveData(dataSet);
+			FileManager.FileManager.saveData(dataSet);
 			PublicDataManager.deviceCreated = false;
 
 			Dispose(true);

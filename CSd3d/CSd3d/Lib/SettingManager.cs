@@ -1,8 +1,5 @@
 ﻿using MelloRin.FileManager;
-using System;
 using System.Collections;
-
-using DataSet = MelloRin.FileManager.DataSet;
 
 namespace MelloRin.CSd3d.Lib
 {
@@ -17,17 +14,16 @@ namespace MelloRin.CSd3d.Lib
         public static readonly string[] settingsKey = new string[] { "width", "height", "windowded" };
         public static readonly string[] inputKeysKey = new string[] { "up", "down", "left", "right" };
 
-        public SettingManager(DataSet dataSet)
+        public SettingManager(SaveFileDataSet dataSet)
         {
-            try
-            {
-                settings = dataSet.getData("Display");
-                inputKeys = dataSet.getData("Input");
-            }
-            catch (DatasetException)
-            {
-                setDefaultSettings();
-            }
+
+			if(dataSet != null)
+			{
+				settings = dataSet.getData("Display");
+				inputKeys = dataSet.getData("Input");
+			}
+			else
+				setDefaultSettings();
         }
 
         public string getSetting(string key) => settings[key].ToString();
@@ -35,7 +31,6 @@ namespace MelloRin.CSd3d.Lib
         {
             if (settings.ContainsKey(key))
             {
-				Console.WriteLine("초기세팅");
                 settings[key] = value;
             }
         }

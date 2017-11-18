@@ -4,17 +4,14 @@ using SharpDX.Direct3D11;
 using SharpDX.DXGI;
 using SharpDX.Mathematics.Interop;
 using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Collections.Concurrent;
 
 namespace MelloRin.CSd3d
 {
 	public class D2DFont : IDisposable, IDrawable, IListable
 	{
 		public RenderTarget renderTarget { get; private set; }
-		private Dictionary<string, FontData> _Ldraw = new Dictionary<string, FontData>();
-
-		static public D2DSprite test;
+		private ConcurrentDictionary<string, FontData> _Ldraw = new ConcurrentDictionary<string, FontData>();
 
 		public D2DFont(Texture2D backBuffer)
 		{
@@ -34,7 +31,7 @@ namespace MelloRin.CSd3d
 			}
 			else
 			{
-				_Ldraw.Add(tag, (FontData)data);
+				_Ldraw.TryAdd(tag, (FontData)data);
 			}
 		}
 
@@ -42,11 +39,9 @@ namespace MelloRin.CSd3d
 		{
 			if (_Ldraw.ContainsKey(tag))
 			{
-				_Ldraw.Remove(tag);
+				_Ldraw.TryRemove(tag, out FontData temp);
 			}
 		}
-
-		//usage = {only change x,y => modString("tag", x: 9, y: 10);} {only change text => modString("tag",text:" ");}
 
 		public void modString(string tag, string text)
 		{
@@ -69,17 +64,20 @@ namespace MelloRin.CSd3d
 		{
 			renderTarget.BeginDraw();
 
-			foreach (string key in _Ldraw.Keys.ToArray())
+			foreach (string key in _Ldraw.Keys)
 			{
 				FontData drawTarget = _Ldraw[key];
-				renderTarget.DrawText(drawTarget.text, drawTarget._directWriteTextFormat, new RawRectangleF(drawTarget.x, drawTarget.y, float.Parse(PublicDataManager.settings.getSetting("width")) , float.Parse(PublicDataManager.settings.getSetting("width"))), drawTarget._directWriteFontColor);
+				renderTarget.DrawText(drawTarget.text, drawTarget._directWriteTextFormat, 
+					new RawRectangleF(drawTarget.x, drawTarget.y, float.Parse(PublicDataManager.settings.getSetting("width")) , float.Parse(PublicDataManager.settings.getSetting("width"))), 
+					drawTarget._directWriteFontColor);
+
 			}
 			renderTarget.EndDraw();
 		}
 
 		public void Dispose()
 		{
-			foreach (string key in _Ldraw.Keys.ToArray())
+			foreach (string key in _Ldraw.Keys)
 			{
 				FontData drawTarget = _Ldraw[key];
 

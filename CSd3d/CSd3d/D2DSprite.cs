@@ -32,10 +32,9 @@ namespace MelloRin.CSd3d
 
 		public static BitmapBrush makeBitmapBrush(RenderTarget renderTarget, string imgName, bool blankImage = false)
 		{
-			string imageSrc = String.Format(@"{0}\res\sprite\{1}", Directory.GetCurrentDirectory(), imgName);
-			FileInfo fileInfo = new FileInfo(imageSrc);
+			string imageSrc = Program.spriteFileDir + imgName;
 
-			if(blankImage)
+			if (blankImage)
 			{
 				var pf = new SharpDX.Direct2D1.PixelFormat()
 				{
@@ -43,12 +42,11 @@ namespace MelloRin.CSd3d
 					Format = Format.B8G8R8A8_UNorm
 				};
 
-				BitmapRenderTarget pallete = new BitmapRenderTarget(renderTarget, CompatibleRenderTargetOptions.GdiCompatible,  pf);
+				BitmapRenderTarget pallete = new BitmapRenderTarget(renderTarget, CompatibleRenderTargetOptions.GdiCompatible, pf);
 				return new BitmapBrush(renderTarget, pallete.Bitmap, new BitmapBrushProperties() { ExtendModeX = ExtendMode.Wrap, ExtendModeY = ExtendMode.Wrap });
 
 			}
-
-			if (fileInfo.Exists)
+			if (File.Exists(imageSrc))
 			{
 				ImagingFactory imagingFactory = new ImagingFactory();
 				NativeFileStream fileStream = new NativeFileStream(imageSrc,
@@ -113,7 +111,7 @@ namespace MelloRin.CSd3d
 			{
 				SpriteData drawTarget = _LSprite[key];
 
-				if(_LSprite[key].bitmapBrush != null)
+				if (_LSprite[key].bitmapBrush != null)
 				{
 					renderTarget.Transform = Matrix3x2.Translation(drawTarget.x, drawTarget.y);
 					renderTarget.FillRectangle(new RectangleF(0, 0, drawTarget.bitmapBrush.Bitmap.Size.Width, drawTarget.bitmapBrush.Bitmap.Size.Height), drawTarget.bitmapBrush);

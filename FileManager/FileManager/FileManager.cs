@@ -4,12 +4,13 @@ using System.IO;
 
 namespace MelloRin.FileManager
 {
-	public class File_manager
+	public static class FileManager
 	{
-		private static readonly string saveFileName = "savedata.mlr";
-		private DataSet dataSet = new DataSet();
+		public static readonly string currentDir = Directory.GetCurrentDirectory();
+		public static readonly string saveFileDir = String.Format(@"{0}\res\", currentDir);
+		public static readonly string saveFileName = saveFileDir + "savedata.mlr";
 
-		public static bool loadData(out DataSet dataSet)
+		public static void loadData(out SaveFileDataSet dataSet)
 		{
 			if (File.Exists(saveFileName))
 			{
@@ -24,7 +25,7 @@ namespace MelloRin.FileManager
 
 				string tag = null;
 
-				dataSet = new DataSet();
+				dataSet = new SaveFileDataSet();
 				Hashtable data = null;
 
 				for (int i = 0; i < line.Length - 1; i++)
@@ -57,19 +58,12 @@ namespace MelloRin.FileManager
 			}
 			else
 			{
-				dataSet = new DataSet();
+				dataSet = new SaveFileDataSet();
 			}
-
-			return true;
 		}
 
-		public static bool saveData(DataSet dataSet)
+		public static void saveData(SaveFileDataSet dataSet)
 		{
-			if (File.Exists(saveFileName))
-			{
-				File.Delete(saveFileName);
-			}
-
 			Guid guid = Guid.NewGuid();
 
 			string[] temp = guid.ToString().Split('-');
@@ -91,15 +85,16 @@ namespace MelloRin.FileManager
 					raw_data += String.Format("{0}={1}\n", key, data[key.ToString()]);
 				}
 			}
-			string output = String.Format("{0}{1}", uuid, AES256_manager.encrypt(raw_data, uuid));
+			string output = uuid + AES256_manager.encrypt(raw_data, uuid);
+
+			if (File.Exists(saveFileName))
+			{
+				File.Delete(saveFileName);
+			}
 
 			StreamWriter writer = new StreamWriter(saveFileName);
 			writer.Write(output);
 			writer.Close();
-
-			return true;
 		}
 	}
-
-	public class DatasetException : Exception { }
 }

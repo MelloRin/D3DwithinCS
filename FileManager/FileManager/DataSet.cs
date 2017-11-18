@@ -3,20 +3,18 @@ using System.Collections.Generic;
 
 namespace MelloRin.FileManager
 {
-	public class DataSet
+	public class SaveFileDataSet
 	{
 		private Dictionary<string, Hashtable> dataSet = new Dictionary<string, Hashtable>();
 
 		public Hashtable getData(string key)
 		{
-			try
+			if(dataSet.ContainsKey(key))
 			{
 				return dataSet[key];
 			}
-			catch (KeyNotFoundException)
-			{
-				throw new DatasetException();
-			}
+
+			return null;
 		}
 
 		public void addData(string key, Hashtable data) => dataSet.Add(key, data);

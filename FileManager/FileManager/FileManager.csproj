@@ -43,7 +43,7 @@
   <ItemGroup>
     <Compile Include="AES256_manager.cs" />
     <Compile Include="DataSet.cs" />
-    <Compile Include="File_manager.cs" />
+    <Compile Include="FileManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
