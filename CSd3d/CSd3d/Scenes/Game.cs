@@ -7,10 +7,10 @@ using System;
 using System.IO;
 using System.Threading;
 using System.Timers;
-
+using System.Windows.Forms;
 using Timer = System.Timers.Timer;
 
-namespace MelloRin.CSd3d
+namespace MelloRin.CSd3d.Scenes
 {
 	class Game : ITask
 	{
@@ -86,8 +86,10 @@ namespace MelloRin.CSd3d
 			gameRunning = true;
 
 			loadImage();
-
 			timer.Start();
+
+			drawer.targetForm.KeyDown += _EkeyDown;
+			drawer.targetForm.KeyUp += _EkeyUp;
 
 			Thread _Tgame = new Thread(() =>
 			{
@@ -132,10 +134,9 @@ namespace MelloRin.CSd3d
 			{
 				string musicName = "aac.aac";
 
-				string musicPath = String.Format(@"{0}\{1}", Directory.GetCurrentDirectory(), musicName);
-				FileInfo fileInfo = new FileInfo(musicPath);
+				string musicPath = Program.musicFileDir + musicName;
 
-				if (fileInfo.Exists)
+				if (File.Exists(musicPath))
 				{
 					WaveOut wavePlayer = new WaveOut();
 					AudioFileReader reader = new AudioFileReader(musicPath);
@@ -164,6 +165,7 @@ namespace MelloRin.CSd3d
 
 			taskQueue.runNext();
 		}
+
 		private void loadImage()
 		{
 			drawer.font.add("nowTime", new FontData("Current Time " + DateTime.Now.ToString(), drawer.font.renderTarget, Color.Red, 0, 32));
@@ -185,10 +187,11 @@ namespace MelloRin.CSd3d
 				_LScoreSprite[i] = D2DSprite.makeBitmapBrush(drawer.sprite.renderTarget, String.Format("score-{0}.png", i));
 			}
 
-			for (int i = 1; i <= 7; ++i)
+			drawer.font.add("scoreTable", new FontData("0000000", drawer.font.renderTarget, Color.White, 1000, 0, 70,"applemint"));
+			/*for (int i = 1; i <= 7; ++i)
 			{
 				drawer.sprite.add(String.Format("score{0}", i), new SpriteData(_LScoreSprite[0], 1280 - (i * 55), 0));
-			}
+			}*/
 		}
 
 		private void keyProcss(Gamepad pad)
@@ -236,18 +239,71 @@ namespace MelloRin.CSd3d
 			if (!(pad.LeftTrigger >= 128) && keyFlag[8])
 			{
 				keyFlag[8] = false;
-
 			}
+		}
 
-			if (pad.Buttons.HasFlag(GamepadButtonFlags.LeftShoulder) && !keyFlag[7])
+		private bool[] keyInputList = new bool[SettingManager.inputKeysKey.Length];
+		private void _EkeyDown(object sender, KeyEventArgs e)
+		{
+			string input = e.KeyCode.ToString().ToLower();
+
+			if (PublicDataManager.settings.inputKeySearch(input))
 			{
-				Console.WriteLine("L 범퍼");
-				reset();
-				keyFlag[7] = true;
+				if (input.Equals(PublicDataManager.settings.getInputKeys(SettingManager.inputKeysKey[0])) && !keyInputList[0])
+				{
+					keyInputList[0] = true;
+					if (noteY <= 525 && noteY >= 450)
+					{
+						Console.WriteLine("Perfect {0}", noteCount);
+						drawer.sprite.modPoint("note", 400, 1);
+						++noteCount;
+						++perfect;
+						++maxCombo;
+
+						scoreCalc();
+						noteEffectTimer.Start();
+					}
+				}
+				if (input.Equals(PublicDataManager.settings.getInputKeys(SettingManager.inputKeysKey[1])) && !keyInputList[1])
+				{
+					keyInputList[1] = true;
+				}
+				if (input.Equals(PublicDataManager.settings.getInputKeys(SettingManager.inputKeysKey[2])) && !keyInputList[2])
+				{
+					keyInputList[2] = true;
+				}
+				if (input.Equals(PublicDataManager.settings.getInputKeys(SettingManager.inputKeysKey[3])) && !keyInputList[3])
+				{
+					keyInputList[3] = true;
+				}
 			}
-			if (!pad.Buttons.HasFlag(GamepadButtonFlags.LeftShoulder) && keyFlag[7])
+		}
+
+		private void _EkeyUp(object sender, KeyEventArgs e)
+		{
+			string input = e.KeyCode.ToString().ToLower();
+
+			if (PublicDataManager.settings.inputKeySearch(input))
 			{
-				keyFlag[7] = false;
+				if (input.Equals(PublicDataManager.settings.getInputKeys(SettingManager.inputKeysKey[0])))
+				{
+					keyInputList[0] = false;
+				}
+				if (input.Equals(PublicDataManager.settings.getInputKeys(SettingManager.inputKeysKey[1])))
+				{
+					Console.WriteLine("(DOWN)key UP");
+					keyInputList[1] = false;
+				}
+				if (input.Equals(PublicDataManager.settings.getInputKeys(SettingManager.inputKeysKey[2])))
+				{
+					Console.WriteLine("(LEFT)key UP");
+					keyInputList[2] = false;
+				}
+				if (input.Equals(PublicDataManager.settings.getInputKeys(SettingManager.inputKeysKey[3])))
+				{
+					Console.WriteLine("(RIGHT)key UP");
+					keyInputList[3] = false;
+				}
 			}
 		}
 
@@ -275,13 +331,14 @@ namespace MelloRin.CSd3d
 		{
 			lock(scoreLocker)
 			{
-				string Sscore = String.Format("{0,7}", score);
+				drawer.font.modString("scoreTable", String.Format("{0,7}", score).Replace(" ", "0")); 
+				/*string Sscore = String.Format("{0,7}", score);
 				Sscore = Sscore.Replace(" ", "0");
 
 				for (int i = 0; i < Sscore.Length; ++i)
 				{
 					drawer.sprite.modImage(String.Format("score{0}", (Sscore.Length) - i), _LScoreSprite[Int32.Parse(Sscore[i].ToString())]);
-				}
+				}*/
 			}
 		}
 	}

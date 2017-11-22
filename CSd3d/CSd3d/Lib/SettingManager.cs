@@ -51,10 +51,11 @@ namespace MelloRin.CSd3d.Lib
             settings.Add("height", "720");
             settings.Add("windowded", "true");
 
-            inputKeys.Add("up", "w");
-            inputKeys.Add("down", "s");
-            inputKeys.Add("left", "a");
-            inputKeys.Add("right", "d");
-        }
+            inputKeys.Add("one", "d");
+            inputKeys.Add("two", "f");
+            inputKeys.Add("three", "j");
+            inputKeys.Add("four", "k");
+			inputKeys.Add("five", "space");
+		}
 	}
 }

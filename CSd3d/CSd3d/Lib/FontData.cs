@@ -5,7 +5,6 @@ using System;
 using Color = SharpDX.Color4;
 using Factory = SharpDX.DirectWrite.Factory;
 
-
 namespace MelloRin.CSd3d.Lib
 {
 	public class FontData : ListData,IDisposable

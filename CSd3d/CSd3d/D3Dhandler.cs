@@ -20,14 +20,12 @@ namespace MelloRin.CSd3d
 	{
 		public D2DFont font { get; protected set; }
 		public D2DSprite sprite { get; protected set; }
+		public RenderForm targetForm { get; protected set; }
 	}
 
-	class D3Dhandler : RenderTaskerHandler, IDisposable, ITask
+	public class D3Dhandler : RenderTaskerHandler, IDisposable, ITask
 	{
 		#region field members
-		//form
-		private RenderForm targetForm;
-
 		//D3D device
 		private Device _device;
 		private SwapChain _swapChain;
@@ -57,7 +55,7 @@ namespace MelloRin.CSd3d
 			timer.Elapsed += new ElapsedEventHandler((sender, e) =>
 			{
 				font.modString("fps", frame + " fps");
-				font.modString("nowTime","Current Time " + DateTime.Now.ToString());
+				font.modString("nowTime", "Current Time " + DateTime.Now.ToString());
 
 				frame = 0;
 			});
@@ -77,10 +75,10 @@ namespace MelloRin.CSd3d
 					{
 						//background_Render();
 						Clear(new RawColor4(0f, 0f, 0f, 1f));
-						font.draw();
 						sprite.draw();
-
+						font.draw();
 						Present();
+
 						++frame;
 					}
 					catch (SharpDXException e)
@@ -102,7 +100,7 @@ namespace MelloRin.CSd3d
 			{
 				desc = new SwapChainDescription()
 				{
-					BufferCount = 2,//buffer count
+					BufferCount = 1,//buffer count
 					ModeDescription = new ModeDescription(targetForm.ClientSize.Width, targetForm.ClientSize.Height, new Rational(60, 1), Format.R8G8B8A8_UNorm),//sview
 					IsWindowed = Boolean.Parse(PublicDataManager.settings.getSetting("windowded")),
 					OutputHandle = targetForm.Handle,
@@ -111,7 +109,7 @@ namespace MelloRin.CSd3d
 					Usage = Usage.RenderTargetOutput
 				};
 			}));
-			
+
 			FeatureLevel[] levels = new FeatureLevel[] { FeatureLevel.Level_11_0 };
 			DeviceCreationFlags flag = DeviceCreationFlags.None | DeviceCreationFlags.BgraSupport;
 
@@ -121,7 +119,7 @@ namespace MelloRin.CSd3d
 
 			_backBufferTexture = _swapChain.GetBackBuffer<Texture2D>(0);
 			font = new D2DFont(_backBufferTexture);
-			font.add("fps", new FontData(frame + " fps", font.renderTarget, Color.White));
+			font.add("fps", new FontData(frame + " fps", font.renderTarget, Color.White, fontName: "applemint"));
 			sprite = new D2DSprite(_backBufferTexture);
 
 			_backbufferView = new RenderTargetView(_device, _backBufferTexture);
@@ -141,7 +139,7 @@ namespace MelloRin.CSd3d
 				CpuAccessFlags = CpuAccessFlags.None,
 				OptionFlags = ResourceOptionFlags.None
 			});
-			
+
 			// Create the depth buffer view
 			_zbufferView = new DepthStencilView(_device, _zbufferTexture);
 			_zbufferTexture.Dispose();
@@ -191,7 +189,6 @@ namespace MelloRin.CSd3d
 		}
 	}
 }
-
 
 /*private void constructing()
 {
