@@ -1,8 +1,15 @@
-﻿namespace MelloRin.CSd3d.Lib
+﻿using SharpDX.XInput;
+
+namespace MelloRin.CSd3d.Lib
 {
 	public class ListData
 	{
 		public int x, y;
+	}
+
+	public interface IControllable
+	{
+		void keyProcss(Gamepad pad);
 	}
 	
 	public interface IListable

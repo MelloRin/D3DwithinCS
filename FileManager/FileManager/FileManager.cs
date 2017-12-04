@@ -58,7 +58,7 @@ namespace MelloRin.FileManager
 			}
 			else
 			{
-				dataSet = new SaveFileDataSet();
+				dataSet = null;
 			}
 		}
 

@@ -6,7 +6,6 @@ using SharpDX.DXGI;
 using SharpDX.Mathematics.Interop;
 using SharpDX.Windows;
 using System;
-using System.Collections.Concurrent;
 using System.Threading;
 using System.Timers;
 using System.Windows.Forms;
@@ -35,16 +34,9 @@ namespace MelloRin.CSd3d
 		private Texture2D _backBufferTexture;
 		private SwapChainDescription desc;
 
-		//rendertask
-		private ConcurrentDictionary<string, Action> _Ltask = new ConcurrentDictionary<string, Action>();
-
 		private Timer timer;
 
 		private int frame = 0;
-
-		//background
-		private bool b_up = false;
-		private float B = 0f;
 		#endregion
 
 		public D3Dhandler(RenderForm mainForm)
@@ -55,7 +47,7 @@ namespace MelloRin.CSd3d
 			timer.Elapsed += new ElapsedEventHandler((sender, e) =>
 			{
 				font.modString("fps", frame + " fps");
-				font.modString("nowTime", "Current Time " + DateTime.Now.ToString());
+				//font.modString("nowTime", "Current Time " + DateTime.Now.ToString());
 
 				frame = 0;
 			});
@@ -73,7 +65,6 @@ namespace MelloRin.CSd3d
 				{
 					try
 					{
-						//background_Render();
 						Clear(new RawColor4(0f, 0f, 0f, 1f));
 						sprite.draw();
 						font.draw();
@@ -150,25 +141,6 @@ namespace MelloRin.CSd3d
 			PublicDataManager.deviceCreated = true;
 		}
 
-		private void background_Render()
-		{
-			if (b_up)
-			{
-				if (B < 1f)
-					B += 0.01f;
-				else
-					b_up = false;
-			}
-			else
-			{
-				if (B >= 0f)
-					B -= 0.01f;
-				else
-					b_up = true;
-			}
-			Clear(new RawColor4(0, 0, B, 1));
-		}
-
 		private void Clear(RawColor4 color)
 		{
 			_deviceContext.ClearRenderTargetView(_backbufferView, color);
@@ -189,23 +161,3 @@ namespace MelloRin.CSd3d
 		}
 	}
 }
-
-/*private void constructing()
-{
-	Dictionary<string,Action> list = new Dictionary<string, Action>();
-
-	ConcurrentDictionary<string, int> test = new ConcurrentDictionary<string, int>();
-
-	Thread[] thread = new Thread[10];
-	Thread _Ttest = new Thread(() =>
-	{
-
-
-	});
-
-	list.Add("asdf",temp);
-
-	Action[] action = new Action[list.Count];
-	list.Values.CopyTo(action, 0);
-	Parallel.Invoke(action);
-}*/

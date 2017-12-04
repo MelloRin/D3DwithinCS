@@ -1,7 +1,7 @@
 ﻿using MelloRin.CSd3d.Lib;
 using System;
 
-namespace CSd3d.Scenes
+namespace MelloRin.CSd3d.Scenes
 {
 	class MusicSelect : ITask
 	{

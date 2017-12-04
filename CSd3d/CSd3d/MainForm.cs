@@ -28,8 +28,8 @@ namespace MelloRin.CSd3d
 			ClientSize = new Size((int)width, (int)height);
 
 			FormClosed += new FormClosedEventHandler(_EformClosed);
-			KeyDown += new KeyEventHandler(_EkeyDown);
-			KeyUp += new KeyEventHandler(_EkeyUp);
+			/*KeyDown += _EkeyDown;
+			KeyUp += _EkeyUp;*/
 
 			MouseClick += new MouseEventHandler((object sender, MouseEventArgs e) =>
 			{

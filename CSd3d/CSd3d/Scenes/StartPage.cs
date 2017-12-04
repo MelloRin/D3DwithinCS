@@ -7,7 +7,7 @@ using Timer = System.Timers.Timer;
 
 namespace MelloRin.CSd3d.Scenes
 {
-	public class StartPage : ITask
+	public class StartPage : ITask , IControllable
 	{
 		private D3Dhandler drawer;
 		private Timer animationTimer;
@@ -18,7 +18,7 @@ namespace MelloRin.CSd3d.Scenes
 		public StartPage(D3Dhandler drawer)
 		{
 			this.drawer = drawer;
-			drawer.sprite.setBackground("background", new SpriteData(D2DSprite.makeBitmapBrush(drawer.sprite.renderTarget, "mainScreen.png"),0,-720));
+			drawer.sprite.setBackground("background", new SpriteData(D2DSprite.makeBitmapBrush(drawer.sprite.renderTarget, "mainScreen.png"),0,0));
 		}
 
 		public void run(TaskQueue taskQueue)
@@ -32,16 +32,15 @@ namespace MelloRin.CSd3d.Scenes
 
 				while (startPageRunning)
 				{
-					//Thread.Sleep(5000);
-					animationTimer.Start();
 					if (controller.IsConnected)
 					{
 						keyProcss(controller.GetState().Gamepad);
 					}
 					Thread.Sleep(1);
+					startPageRunning = false;
 				}
 
-				PublicDataManager.currentTaskQueue.addTask(new Game(drawer));
+				PublicDataManager.currentTaskQueue.addTask(new Game(drawer,"aac"));
 			});
 			_TstartPage.Start();
 
@@ -67,15 +66,16 @@ namespace MelloRin.CSd3d.Scenes
 			}
 		}
 
-		private void keyProcss(Gamepad pad)
+		public void keyProcss(Gamepad pad)
 		{
-			if (pad.Buttons.HasFlag(GamepadButtonFlags.Start) && !keyFlag[1])
+			if (pad.Buttons.HasFlag(GamepadButtonFlags.Start) && !keyFlag[0])
 			{
-				keyFlag[1] = true;
+				keyFlag[0] = true;
+				animationTimer.Start();
 			}
-			if (!pad.Buttons.HasFlag(GamepadButtonFlags.Start) && keyFlag[1])
+			if (!pad.Buttons.HasFlag(GamepadButtonFlags.Start) && keyFlag[0])
 			{
-				keyFlag[1] = false;
+				keyFlag[0] = false;
 			}
 		}
 	}

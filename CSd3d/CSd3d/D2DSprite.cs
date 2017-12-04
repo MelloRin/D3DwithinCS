@@ -7,7 +7,9 @@ using SharpDX.IO;
 using SharpDX.WIC;
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 using Bitmap = SharpDX.Direct2D1.Bitmap;
 
@@ -16,16 +18,16 @@ namespace MelloRin.CSd3d
 	public class D2DSprite : IDisposable, IListable, IDrawable
 	{
 		public static ConcurrentDictionary<string, SpriteData> _LBackgroundSprite { get; private set; }
-		public static ConcurrentDictionary<string, SpriteData> _LSprite { get; private set; }
-		public static ConcurrentDictionary<string, ClickableSprite> _LClickableSprite { get; private set; }
+		public static Dictionary<string, SpriteData> _LSprite { get; private set; }
+		public static Dictionary<string, ClickableSprite> _LClickableSprite { get; private set; }
 
 		public RenderTarget renderTarget { get; private set; }
 
 		public D2DSprite(Texture2D backBuffer)
 		{
 			_LBackgroundSprite = new ConcurrentDictionary<string, SpriteData>();
-			_LSprite = new ConcurrentDictionary<string, SpriteData>();
-			_LClickableSprite = new ConcurrentDictionary<string, ClickableSprite>();
+			_LSprite = new Dictionary<string, SpriteData>();
+			_LClickableSprite = new Dictionary<string, ClickableSprite>();
 
 
 			var d2dFactory = new SharpDX.Direct2D1.Factory();
@@ -125,7 +127,7 @@ namespace MelloRin.CSd3d
 				}
 			}
 
-			foreach (string key in _LSprite.Keys)
+			foreach (string key in _LSprite.Keys.ToArray())
 			{
 				SpriteData drawTarget = _LSprite[key];
 
@@ -136,7 +138,7 @@ namespace MelloRin.CSd3d
 				}
 			}
 
-			foreach (string key in _LClickableSprite.Keys)
+			foreach (string key in _LClickableSprite.Keys.ToArray())
 			{
 				SpriteData drawTarget = _LClickableSprite[key];
 
@@ -158,7 +160,7 @@ namespace MelloRin.CSd3d
 			}
 			else
 			{
-				_LSprite.TryAdd(tag, (SpriteData)data);
+				_LSprite.Add(tag, (SpriteData)data);
 			}
 		}
 
@@ -199,7 +201,7 @@ namespace MelloRin.CSd3d
 			}
 			else
 			{
-				_LClickableSprite.TryAdd(tag, (ClickableSprite)data);
+				_LClickableSprite.Add(tag, (ClickableSprite)data);
 			}
 			((ClickableSprite)data).OnMouseClick += (Object sender, EventArgs e) =>
 			{
@@ -211,14 +213,13 @@ namespace MelloRin.CSd3d
 		{
 			if (_LSprite.ContainsKey(tag))
 			{
-				_LSprite.TryRemove(tag, out SpriteData temp);
+				_LSprite.Remove(tag);
 			}
 		}
 
-
 		public void Dispose()
 		{
-			foreach (string key in _LSprite.Keys)
+			foreach (string key in _LSprite.Keys.ToArray())
 			{
 				SpriteData drawTarget = _LSprite[key];
 
