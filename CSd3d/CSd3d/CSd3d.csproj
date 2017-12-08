@@ -5,7 +5,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{18CDBE09-EB8E-4F42-AD89-49B2B1D780A1}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <OutputType>WinExe</OutputType>
     <RootNamespace>CSd3d</RootNamespace>
     <AssemblyName>CSd3d</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
@@ -70,10 +70,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="D2DFont.cs" />
-    <Compile Include="D2DSprite.cs" />
-    <Compile Include="D3Dhandler.cs" />
-    <Compile Include="Lib\NoteManager.cs" />
+    <Compile Include="Core\D2DFont.cs" />
+    <Compile Include="Core\D2DSprite.cs" />
+    <Compile Include="Core\D3Dhandler.cs" />
+    <Compile Include="Lib\Notes\NoteManager.cs" />
+    <Compile Include="Lib\Notes\NoteQueue.cs" />
     <Compile Include="Scenes\Game.cs" />
     <Compile Include="Lib\FontData.cs" />
     <Compile Include="Lib\FontLoader.cs" />
@@ -84,7 +85,7 @@
     <Compile Include="Lib\SpriteData.cs" />
     <Compile Include="Lib\TaskQueue.cs" />
     <Compile Include="Lib\tester.cs" />
-    <Compile Include="MainForm.cs">
+    <Compile Include="Core\MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Program.cs" />
@@ -97,7 +98,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="MainForm.resx">
+    <EmbeddedResource Include="Core\MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>

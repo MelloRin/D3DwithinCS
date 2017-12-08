@@ -1,4 +1,5 @@
-﻿using MelloRin.CSd3d.Lib;
+﻿using MelloRin.CSd3d.Core;
+using MelloRin.CSd3d.Lib;
 using MelloRin.CSd3d.Scenes;
 using MelloRin.FileManager;
 using System;
@@ -39,7 +40,7 @@ namespace MelloRin.CSd3d
 			PublicDataManager.currentTaskQueue.addTask(drawer);
 			PublicDataManager.currentTaskQueue.addTask(new StartPage(drawer));
 
-			//PublicDataManager.currentTaskQueue.addTask(new Game(drawer));
+			//PublicDataManager.currentTaskQueue.addTask(new Game(drawer,"aac"));
 		}
 	}
 }

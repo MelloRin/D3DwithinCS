@@ -3,17 +3,16 @@ using System.Collections;
 
 namespace MelloRin.CSd3d.Lib
 {
-    public class SaveDataManager
-    {
-        private Hashtable scoreTable = new Hashtable();
-        public Hashtable getScoretable() => scoreTable;
+	public class SaveDataManager
+	{
+		private Hashtable scoreTable = new Hashtable();
+		public Hashtable getScoretable() => scoreTable;
 
-        public static readonly string[] musicName = new string[] { "a", "b", "c" };
+		public static readonly string[] musicName = new string[] { "Ice Cream Sandwich" };
 
-        public SaveDataManager(SaveFileDataSet dataSet)
-        {
-
-			if(dataSet != null)
+		public SaveDataManager(SaveFileDataSet dataSet)
+		{
+			if (dataSet != null)
 			{
 				scoreTable = dataSet.getData("Score");
 			}
@@ -24,14 +23,14 @@ namespace MelloRin.CSd3d.Lib
 					scoreTable.Add(musicName[i], i);
 				}
 			}
-        }
+		}
 
-        public void updateScore(string music_key, int score)
-        {
-            if (scoreTable.ContainsKey(music_key))
-                scoreTable[music_key] = score;
-            else
-                scoreTable.Add(music_key, score);
-        }
-    }
+		public void updateScore(string music_key, int score)
+		{
+			if (scoreTable.ContainsKey(music_key))
+				scoreTable[music_key] = score;
+			else
+				scoreTable.Add(music_key, score);
+		}
+	}
 }

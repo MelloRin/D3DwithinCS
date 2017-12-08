@@ -6,7 +6,7 @@ using System.Drawing;
 using System.Threading;
 using System.Windows.Forms;
 
-namespace MelloRin.CSd3d
+namespace MelloRin.CSd3d.Core
 {
 	class MainForm : RenderForm, ITask
 	{
@@ -36,8 +36,16 @@ namespace MelloRin.CSd3d
 				Console.WriteLine("{0},{1}", e.X, e.Y);
 				foreach (string i in D2DSprite._LClickableSprite.Keys)
 				{
-					ClickableSprite seekTarget = D2DSprite._LClickableSprite[i];
-					seekTarget.pointCheck(e.X, e.Y);
+					try
+					{
+						ClickableSprite seekTarget = D2DSprite._LClickableSprite[i];
+						seekTarget.pointCheck(e.X, e.Y);
+					}
+					catch(Exception)
+					{
+
+					}
+					
 				}
 			});
 

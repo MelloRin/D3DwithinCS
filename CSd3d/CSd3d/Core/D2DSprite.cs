@@ -13,13 +13,13 @@ using System.Linq;
 
 using Bitmap = SharpDX.Direct2D1.Bitmap;
 
-namespace MelloRin.CSd3d
+namespace MelloRin.CSd3d.Core
 {
 	public class D2DSprite : IDisposable, IListable, IDrawable
 	{
 		public static ConcurrentDictionary<string, SpriteData> _LBackgroundSprite { get; private set; }
 		public static Dictionary<string, SpriteData> _LSprite { get; private set; }
-		public static Dictionary<string, ClickableSprite> _LClickableSprite { get; private set; }
+		public static ConcurrentDictionary<string, ClickableSprite> _LClickableSprite { get; private set; }
 
 		public RenderTarget renderTarget { get; private set; }
 
@@ -27,7 +27,7 @@ namespace MelloRin.CSd3d
 		{
 			_LBackgroundSprite = new ConcurrentDictionary<string, SpriteData>();
 			_LSprite = new Dictionary<string, SpriteData>();
-			_LClickableSprite = new Dictionary<string, ClickableSprite>();
+			_LClickableSprite = new ConcurrentDictionary<string, ClickableSprite>();
 
 
 			var d2dFactory = new SharpDX.Direct2D1.Factory();
@@ -36,6 +36,13 @@ namespace MelloRin.CSd3d
 
 			d2dSurface.Dispose();
 			d2dFactory.Dispose();
+		}
+
+		public static void resetData()
+		{
+			_LBackgroundSprite = new ConcurrentDictionary<string, SpriteData>();
+			_LSprite = new Dictionary<string, SpriteData>();
+			_LClickableSprite = new ConcurrentDictionary<string, ClickableSprite>();
 		}
 
 		public static BitmapBrush makeBitmapBrush(RenderTarget renderTarget, string imgName, bool blankImage = false)
@@ -115,7 +122,6 @@ namespace MelloRin.CSd3d
 		{
 			renderTarget.BeginDraw();
 
-
 			foreach(string key in _LBackgroundSprite.Keys)
 			{
 				SpriteData drawTarget = _LBackgroundSprite[key];
@@ -127,18 +133,26 @@ namespace MelloRin.CSd3d
 				}
 			}
 
-			foreach (string key in _LSprite.Keys.ToArray())
+			string[] _LrenderQueue = _LSprite.Keys.ToArray();
+			for(int i = 0; i < _LrenderQueue.Length; ++i)
 			{
-				SpriteData drawTarget = _LSprite[key];
-
-				if (_LSprite[key].bitmapBrush != null)
+				try
 				{
-					renderTarget.Transform = Matrix3x2.Translation(drawTarget.x, drawTarget.y);
-					renderTarget.FillRectangle(new RectangleF(0, 0, drawTarget.bitmapBrush.Bitmap.Size.Width, drawTarget.bitmapBrush.Bitmap.Size.Height), drawTarget.bitmapBrush);
+					string key = _LrenderQueue[i];
+					SpriteData drawTarget = _LSprite[key];
+
+					if (_LSprite[key].bitmapBrush != null)
+					{
+						renderTarget.Transform = Matrix3x2.Translation(drawTarget.x, drawTarget.y);
+						renderTarget.FillRectangle(new RectangleF(0, 0, drawTarget.bitmapBrush.Bitmap.Size.Width, drawTarget.bitmapBrush.Bitmap.Size.Height), drawTarget.bitmapBrush);
+					}
+				}
+				catch(KeyNotFoundException)
+				{
+
 				}
 			}
-
-			foreach (string key in _LClickableSprite.Keys.ToArray())
+			foreach(string key in _LClickableSprite.Keys)
 			{
 				SpriteData drawTarget = _LClickableSprite[key];
 
@@ -148,7 +162,6 @@ namespace MelloRin.CSd3d
 					renderTarget.FillRectangle(new RectangleF(0, 0, drawTarget.bitmapBrush.Bitmap.Size.Width, drawTarget.bitmapBrush.Bitmap.Size.Height), drawTarget.bitmapBrush);
 				}
 			}
-
 			renderTarget.EndDraw();
 		}
 
@@ -191,6 +204,10 @@ namespace MelloRin.CSd3d
 			{
 				_LBackgroundSprite[tag].bitmapBrush = bitmapBrush;
 			}
+			else
+			{
+				_LBackgroundSprite.TryAdd(tag, new SpriteData(bitmapBrush,0,0));
+			}
 		}
 
 		public void addButton(string tag, ListData data)
@@ -201,12 +218,8 @@ namespace MelloRin.CSd3d
 			}
 			else
 			{
-				_LClickableSprite.Add(tag, (ClickableSprite)data);
+				_LClickableSprite.TryAdd(tag, (ClickableSprite)data);
 			}
-			((ClickableSprite)data).OnMouseClick += (Object sender, EventArgs e) =>
-			{
-				Console.WriteLine("{0} 클릭됨.", tag);
-			};
 		}
 
 		public void delete(string tag)

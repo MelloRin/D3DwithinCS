@@ -6,7 +6,7 @@ using SharpDX.Mathematics.Interop;
 using System;
 using System.Collections.Concurrent;
 
-namespace MelloRin.CSd3d
+namespace MelloRin.CSd3d.Core
 {
 	public class D2DFont : IDisposable, IDrawable, IListable
 	{

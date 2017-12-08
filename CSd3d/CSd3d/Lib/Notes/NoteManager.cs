@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace MelloRin.CSd3d.Lib.NoteData
+namespace MelloRin.CSd3d.Lib.Notes
 {
 	public class MinData
 	{

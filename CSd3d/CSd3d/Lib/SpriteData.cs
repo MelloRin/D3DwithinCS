@@ -26,6 +26,7 @@ namespace MelloRin.CSd3d.Lib
 	{
 		public int priority { get; private set; }
 
+
 		public event EventHandler OnMouseClick;
 
 		public ClickableSprite(BitmapBrush bitmapBrush, int x, int y, int priority) : base(bitmapBrush, x, y)

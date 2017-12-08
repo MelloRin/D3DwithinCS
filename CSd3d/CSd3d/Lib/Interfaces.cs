@@ -28,4 +28,9 @@ namespace MelloRin.CSd3d.Lib
 	{
 		void run(TaskQueue taskQueue);
 	}
+
+	public interface IScene
+	{
+		void initialize();
+	}
 }

@@ -13,7 +13,7 @@ using System.Windows.Forms;
 using Device = SharpDX.Direct3D11.Device;
 using Timer = System.Timers.Timer;
 
-namespace MelloRin.CSd3d
+namespace MelloRin.CSd3d.Core
 {
 	public class RenderTaskerHandler
 	{

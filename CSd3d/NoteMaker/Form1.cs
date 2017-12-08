@@ -36,7 +36,7 @@ namespace NoteMaker
 
 			Thread _Tmusic = new Thread(() =>
 			{
-				string musicName = "aac.aac";
+				string musicName = "music1.mp3";
 
 				if (File.Exists(musicName))
 				{
