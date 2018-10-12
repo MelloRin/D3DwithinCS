@@ -40,7 +40,6 @@ namespace MelloRin.CSd3d.Core
 
 		public static void resetData()
 		{
-			_LBackgroundSprite = new ConcurrentDictionary<string, SpriteData>();
 			_LSprite = new Dictionary<string, SpriteData>();
 			_LClickableSprite = new ConcurrentDictionary<string, ClickableSprite>();
 		}
@@ -59,7 +58,6 @@ namespace MelloRin.CSd3d.Core
 
 				BitmapRenderTarget pallete = new BitmapRenderTarget(renderTarget, CompatibleRenderTargetOptions.GdiCompatible, pf);
 				return new BitmapBrush(renderTarget, pallete.Bitmap, new BitmapBrushProperties() { ExtendModeX = ExtendMode.Wrap, ExtendModeY = ExtendMode.Wrap });
-
 			}
 			if (File.Exists(imageSrc))
 			{

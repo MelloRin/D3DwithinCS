@@ -53,6 +53,11 @@ namespace MelloRin.CSd3d.Core
 			});
 		}
 
+		public void initialize()
+		{
+
+		}
+
 		public void run(TaskQueue taskQueue)
 		{
 			createDevice();

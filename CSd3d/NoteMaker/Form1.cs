@@ -87,7 +87,8 @@ namespace NoteMaker
 				uuid += temp[i];
 			}
 
-			string output = uuid + AES256_manager.encrypt(builder.ToString(), uuid);
+			string rawData = "0/0/3/000\n1 / 0 / 4 / 000\n2 / 0 / 4 / 370\n3 / 0 / 4 / 730\n3 / 0 / 5 / 450\n2 / 0 / 5 / 600\n0 / 0 / 5 / 860\n1 / 0 / 6 / 100\n2 / 0 / 6 / 250\n0 / 0 / 6 / 550\n0 / 0 / 6 / 800\n2 / 0 / 7 / 270\n1 / 0 / 7 / 750\n3 / 0 / 9 / 130\n0 / 0 / 9 / 720\n2 / 0 / 10 / 140\n1 / 0 / 10 / 205\n4 / 0 / 10 / 500\n0 / 0 / 11 / 020\n4 / 0 / 11 / 500\n3 / 0 / 12 / 000\n4 / 0 / 12 / 200";
+			string output = uuid + AES256_manager.encrypt(rawData, uuid);
 			writer.Write(output);
 			writer.Close();
 		}

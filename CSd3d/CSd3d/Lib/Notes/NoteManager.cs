@@ -118,14 +118,22 @@ namespace MelloRin.CSd3d.Lib.Notes
 
 		public SecData getSecData(int min, int sec)
 		{
-			if (data[min].secData.ContainsKey(sec))
+			try
 			{
-				return data[min].secData[sec];
+				if (data[min].secData.ContainsKey(sec))
+				{
+					return data[min].secData[sec];
+				}
+				else
+				{
+					return null;
+				}
 			}
-			else
+			catch(Exception)
 			{
 				return null;
 			}
+
 		}
 	}
 }

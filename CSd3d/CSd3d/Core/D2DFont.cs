@@ -11,7 +11,18 @@ namespace MelloRin.CSd3d.Core
 	public class D2DFont : IDisposable, IDrawable, IListable
 	{
 		public RenderTarget renderTarget { get; private set; }
-		private ConcurrentDictionary<string, FontData> _Ldraw = new ConcurrentDictionary<string, FontData>();
+		public static ConcurrentDictionary<string, FontData> _Ldraw = new ConcurrentDictionary<string, FontData>();
+
+		public static void resetData()
+		{
+			foreach (string key in _Ldraw.Keys)
+			{
+				if(!key.Equals("fps"))
+				{
+					_Ldraw.TryRemove(key, out FontData value);
+				}
+			}
+		}
 
 		public D2DFont(Texture2D backBuffer)
 		{
@@ -66,10 +77,18 @@ namespace MelloRin.CSd3d.Core
 
 			foreach (string key in _Ldraw.Keys)
 			{
-				FontData drawTarget = _Ldraw[key];
-				renderTarget.DrawText(drawTarget.text, drawTarget._directWriteTextFormat, 
-					new RawRectangleF(drawTarget.x, drawTarget.y, float.Parse(PublicDataManager.settings.getSetting("width")) , float.Parse(PublicDataManager.settings.getSetting("width"))), 
-					drawTarget._directWriteFontColor);
+				try
+				{
+					FontData drawTarget = _Ldraw[key];
+					renderTarget.DrawText(drawTarget.text, drawTarget._directWriteTextFormat,
+						new RawRectangleF(drawTarget.x, drawTarget.y, float.Parse(PublicDataManager.settings.getSetting("width")), float.Parse(PublicDataManager.settings.getSetting("width"))),
+						drawTarget._directWriteFontColor);
+				}
+				catch(Exception)
+				{
+
+				}
+
 
 			}
 			renderTarget.EndDraw();

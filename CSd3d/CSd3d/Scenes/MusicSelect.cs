@@ -17,6 +17,7 @@ namespace MelloRin.CSd3d.Scenes
 		public MusicSelect(RenderTaskerHandler drawer)
 		{
 			D2DSprite.resetData();
+			D2DFont.resetData();
 			this.drawer = drawer;
 			drawer.sprite.setBackground("background", new SpriteData(D2DSprite.makeBitmapBrush(drawer.sprite.renderTarget, "musicSelect.png"), 0, 0));
 			drawer.sprite.addButton("2musiccard1", new ClickableSprite(D2DSprite.makeBitmapBrush(drawer.sprite.renderTarget, "music-1.png"), 70, 120,0));
@@ -48,6 +49,7 @@ namespace MelloRin.CSd3d.Scenes
 					wavePlayer = new WaveOut();
 					audioReader = new AudioFileReader(musicPath);
 					wavePlayer.Init(audioReader);
+					audioReader.Volume = 0.3f;
 
 					wavePlayer.Play();
 				}
@@ -60,20 +62,31 @@ namespace MelloRin.CSd3d.Scenes
 				{
 					Thread.Sleep(1);
 				}
-				wavePlayer.Stop();
+				//wavePlayer.Stop();
 			}
 		}
 
 		private void music1Start(object sender, EventArgs e)
 		{
-			screenRunning = false;
 			wavePlayer.Stop();
+			wavePlayer.Dispose();
+			audioReader.Dispose();
+			screenRunning = false;
 			PublicDataManager.currentTaskQueue.addTask(new Game(drawer,"music1"));
+			wavePlayer.Stop();
+			wavePlayer.Dispose();
+			audioReader.Dispose();
+			screenRunning = false;
 		}
 
 		public void run(TaskQueue taskQueue)
 		{
 			
+		}
+
+		public void initialize()
+		{
+
 		}
 	}
 }

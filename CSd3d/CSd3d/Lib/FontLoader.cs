@@ -1,106 +1,11 @@
-﻿using SharpDX.DirectWrite;
+﻿using SharpDX;
+using SharpDX.DirectWrite;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SharpDX;
 using System.IO;
 
 namespace MelloRin.CSd3d.Lib
 {
-	/*class FontLoader :  FontCollectionLoader
-	{
-		private Factory factory;
-		private FontCollection fontCollection;
-		private string fontName;
-		private float fontSize;
-		private bool isExternal;
-
-		DataStream keyStream;
-
-		public FontLoader(Factory factory,string fontName,float fontSize, bool isExternal = false)
-		{
-			this.factory = factory;
-			this.fontName = fontName;
-			this.fontSize = fontSize;
-			this.isExternal = isExternal;
-
-
-
-
-			keyStream = new DataStream(sizeof(int) * _fontStreams.Count, true, true);
-			for (int i = 0; i < _fontStreams.Count; i++)
-				keyStream.Write((int)i);
-			keyStream.Position = 0;
-
-			// Register the 
-			factory.RegisterFontFileLoader(this);
-			factory.RegisterFontCollectionLoader(this);
-
-
-
-
-
-
-
-
-
-
-		}
-
-		public TextFormat getTextFormat()
-		{
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-			if(isExternal)
-			{
-				return new TextFormat(factory, fontName, fontCollection, FontWeight.Normal, FontStyle.Normal, FontStretch.Normal, fontSize)
-				{ TextAlignment = TextAlignment.Leading, ParagraphAlignment = ParagraphAlignment.Near };
-			}
-			else
-			{
-				return new TextFormat(factory, fontName, fontSize)
-				{ TextAlignment = TextAlignment.Leading, ParagraphAlignment = ParagraphAlignment.Near };
-			}
-			
-		}
-
-		public IDisposable Shadow { get; set; }
-
-		public FontFileEnumerator CreateEnumeratorFromKey(Factory factory, DataPointer collectionKey)
-		{
-			throw new NotImplementedException();
-		}
-
-		public void Dispose()
-		{
-			throw new NotImplementedException();
-		}
-
-		public DataStream getDataStream()
-		{
-			return keyStream;
-		}
-	}*/
-
 	public class ResourceFontFileStream : CallbackBase, FontFileStream
 	{
 		private readonly DataStream _stream;
@@ -185,30 +90,60 @@ namespace MelloRin.CSd3d.Lib
 
 		public bool resultAvailable;
 
-		public ResourceFontLoader(Factory factory, string fontFile)
+		/*public ResourceFontLoader(Factory factory, string[] fontFile)
 		{
 			_factory = factory;
 
-			if(File.Exists(fontFile))
+			foreach(string currentFontFile in fontFile)
 			{
-				var fontBytes = Utilities.ReadStream(typeof(ResourceFontLoader).Assembly.GetManifestResourceStream(fontFile));
-				var stream = new DataStream(fontBytes.Length, true, true);
-				stream.Write(fontBytes, 0, fontBytes.Length);
-				stream.Position = 0;
-				_fontStreams.Add(new ResourceFontFileStream(stream));
+				if (File.Exists(currentFontFile))
+				{
+					var fontBytes = Utilities.ReadStream(typeof(ResourceFontLoader).Assembly.GetManifestResourceStream(currentFontFile));
+					var stream = new DataStream(fontBytes.Length, true, true);
+					stream.Write(fontBytes, 0, fontBytes.Length);
+					stream.Position = 0;
+					_fontStreams.Add(new ResourceFontFileStream(stream));
 
-				// Build a Key storage that stores the index of the font
-				_keyStream = new DataStream(sizeof(int) * _fontStreams.Count, true, true);
-				for (int i = 0; i < _fontStreams.Count; i++)
-					_keyStream.Write((int)i);
-				_keyStream.Position = 0;
+					// Build a Key storage that stores the index of the font
+					_keyStream = new DataStream(sizeof(int) * _fontStreams.Count, true, true);
+					for (int i = 0; i < _fontStreams.Count; i++)
+						_keyStream.Write(i);
+					_keyStream.Position = 0;
 
-				// Register the 
-				_factory.RegisterFontFileLoader(this);
-				_factory.RegisterFontCollectionLoader(this);
-				resultAvailable = true;
+					// Register the 
+					_factory.RegisterFontFileLoader(this);
+					_factory.RegisterFontCollectionLoader(this);
+					resultAvailable = true;
+				}
 			}
-			resultAvailable = false;
+			//resultAvailable = false;
+		}*/
+
+
+		public ResourceFontLoader(Factory factory, string[] fontFile)
+		{
+			_factory = factory;
+			foreach (string currentFontFile in fontFile)
+			{
+				if (File.Exists(currentFontFile))
+				{
+					var fontBytes = Utilities.ReadStream(File.OpenRead(currentFontFile));
+					var stream = new DataStream(fontBytes.Length, true, true);
+					stream.Write(fontBytes, 0, fontBytes.Length);
+					stream.Position = 0;
+					_fontStreams.Add(new ResourceFontFileStream(stream));
+				}
+			}
+
+			// Build a Key storage that stores the index of the font
+			_keyStream = new DataStream(sizeof(int) * _fontStreams.Count, true, true);
+			for (int i = 0; i < _fontStreams.Count; i++)
+				_keyStream.Write(i);
+			_keyStream.Position = 0;
+
+			// Register the 
+			_factory.RegisterFontFileLoader(this);
+			_factory.RegisterFontCollectionLoader(this);
 		}
 
 

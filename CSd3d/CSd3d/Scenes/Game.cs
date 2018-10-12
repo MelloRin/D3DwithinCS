@@ -17,7 +17,7 @@ using Timer = System.Timers.Timer;
 
 namespace MelloRin.CSd3d.Scenes
 {
-	class Game : ITask, IScene , IControllable
+	class Game : ITask, IControllable
 	{
 		static public bool gameRunning { get; private set; }
 
@@ -31,16 +31,21 @@ namespace MelloRin.CSd3d.Scenes
 		private BitmapBrush[] _LeffectSprite = new BitmapBrush[8];
 		private BitmapBrush[] _LscoreSprite = new BitmapBrush[10];
 		private BitmapBrush[] _LnoteSprite = new BitmapBrush[3];
+		private BitmapBrush[] _LjudgeSprite = new BitmapBrush[3];
 
 		private NoteQueue[] _LnoteQueue = new NoteQueue[5];
 
+		private int judgeShowTime = 0;
+		private Timer judgeTimer = new Timer(100d);
+
+
 		private ConcurrentDictionary<string, NoteData> _LcreatedNotes = new ConcurrentDictionary<string, NoteData>();
-		
+
 		private Timer[] _LnoteEffectTimer = new Timer[4];
 		private int[] _LnoteEffectRunningFrame = new int[4];
 
 		private bool[] keyInputList = new bool[SettingManager.inputKeysKey.Length];
-		
+
 		private string musicName;
 
 		private NoteManager noteManager;
@@ -48,14 +53,13 @@ namespace MelloRin.CSd3d.Scenes
 		private WaveOut wavePlayer;
 		private Stopwatch noteTimer = new Stopwatch();
 
+		private int score;
+		private int fail = 0;
 		private int noteCount = 0;
-		private int totalNote;
+		private int totalNote { get; }
 		private int currentCombo = 0;
 		private int perfect = 0;
-		private int good = 0;
 		private int maxCombo = 0;
-
-		Random r = new Random();
 
 		Controller controller = new Controller(UserIndex.One);
 		bool[] keyFlag = new bool[9];
@@ -63,11 +67,14 @@ namespace MelloRin.CSd3d.Scenes
 		public Game(RenderTaskerHandler drawer, string musicName)
 		{
 			D2DSprite.resetData();
+			D2DSprite.resetData();
 			if (drawer.targetForm.Created)
 			{
 				this.musicName = musicName;
 				this.drawer = drawer;
 
+				noteManager = new NoteManager(musicName);
+				totalNote = noteManager.noteCount;
 
 				initialize();
 			}
@@ -81,10 +88,7 @@ namespace MelloRin.CSd3d.Scenes
 		{
 			gameRunning = true;
 
-			noteManager = new NoteManager(musicName);
-			totalNote = noteManager.noteCount;
-
-			for(int i = 0; i < _LnoteQueue.Length; ++i)
+			for (int i = 0; i < _LnoteQueue.Length; ++i)
 			{
 				_LnoteQueue[i] = new NoteQueue();
 			}
@@ -104,7 +108,7 @@ namespace MelloRin.CSd3d.Scenes
 			{
 				throw new Exception();
 			}
-			
+
 			Thread _Tgame = new Thread(() => _tGame());
 			_Tgame.Start();
 
@@ -128,26 +132,24 @@ namespace MelloRin.CSd3d.Scenes
 			noteCreateTimer.Start();
 			wavePlayer.Play();
 			noteTimer.Start();
-			
+
 			Stopwatch timer = new Stopwatch();
 			timer.Start();
 
-			long nextRenderTime;
-			long renderEndTime;
-			while (gameRunning)
+			while (gameRunning && drawer.targetForm.Created)
 			{
-				nextRenderTime = timer.ElapsedMilliseconds + 4L;
 				if (!PublicDataManager.deviceCreated)
 				{
+					noteCreateTimer.Stop();
 					gameRunning = false;
 				}
 				moveNotes();
-				renderEndTime = timer.ElapsedMilliseconds;
-				//Console.WriteLine(nextRenderTime - renderEndTime);
-				if (renderEndTime < nextRenderTime)
-					Thread.Sleep((int)(nextRenderTime - renderEndTime));
-			}
 
+				Thread.Sleep(2);
+			}
+			noteCreateTimer.Stop();
+
+			PublicDataManager.currentTaskQueue.addTask(new ResultScreen(drawer, musicName, new ScoreData(score, perfect, fail, maxCombo)));
 		}
 
 		private void _EnoteCreate(object sender, ElapsedEventArgs e)
@@ -182,6 +184,7 @@ namespace MelloRin.CSd3d.Scenes
 				Thread.Sleep(100);
 			}
 			wavePlayer.Stop();
+			gameRunning = false;
 		}
 
 		public void initialize()
@@ -198,7 +201,7 @@ namespace MelloRin.CSd3d.Scenes
 				drawer.sprite.add("effect" + i, new SpriteData(null, lineStart + (noteSize * i), judgeLine - (noteSize / 2)));
 			}
 
-			
+
 
 			for (int i = 1; i <= 7; ++i)
 			{
@@ -221,6 +224,26 @@ namespace MelloRin.CSd3d.Scenes
 					}
 				};
 			}
+
+			_LjudgeSprite[0] = D2DSprite.makeBitmapBrush(drawer.sprite.renderTarget, "perfect.png");
+			_LjudgeSprite[1] = D2DSprite.makeBitmapBrush(drawer.sprite.renderTarget, "fail.png");
+			_LjudgeSprite[2] = D2DSprite.makeBitmapBrush(drawer.sprite.renderTarget, null, true);
+
+			drawer.sprite.add("judge", new SpriteData(_LjudgeSprite[2], 435, 445));
+
+			judgeTimer.Elapsed += (sender, e) =>
+			{
+				++judgeShowTime;
+
+				if (judgeShowTime >= 6)
+				{
+					drawer.sprite.modImage("judge", _LjudgeSprite[2]);
+					judgeShowTime = 0;
+					judgeTimer.Stop();
+				}
+			};
+			
+
 
 			_LnoteSprite[0] = D2DSprite.makeBitmapBrush(drawer.sprite.renderTarget, "note-r.png");
 			_LnoteSprite[1] = D2DSprite.makeBitmapBrush(drawer.sprite.renderTarget, "note-b.png");
@@ -251,42 +274,48 @@ namespace MelloRin.CSd3d.Scenes
 		{
 			long absuoluteMs = noteTimer.ElapsedMilliseconds;
 
-			foreach(string currentData in _LcreatedNotes.Keys)
+			foreach (string currentData in _LcreatedNotes.Keys)
 			{
-				long def = ((_LcreatedNotes[currentData].sec * 1000) + _LcreatedNotes[currentData].ms) - absuoluteMs;
-				int lineNum = _LcreatedNotes[currentData].lineNum;
-				if (def < 45L && !_LnoteQueue[lineNum].search(currentData))
+				try
 				{
-					_LnoteQueue[lineNum].addQuque(currentData);
+					long def = ((_LcreatedNotes[currentData].sec * 1000) + _LcreatedNotes[currentData].ms) - absuoluteMs;
+					int lineNum = _LcreatedNotes[currentData].lineNum;
+					if (def < 80L && !_LnoteQueue[lineNum].search(currentData))
+					{
+						_LnoteQueue[lineNum].addQuque(currentData);
+					}
+
+					if (def < -40L)
+					{
+						Console.WriteLine("{0}/{1} deleted", currentData, _LnoteQueue[lineNum].pop());
+						_LcreatedNotes.TryRemove(currentData, out NoteData outData);
+						drawer.sprite.delete(currentData);
+						currentCombo = 0;
+						++fail;
+						judgeChange(1);
+						continue;
+					}
+					drawer.sprite.modPoint(currentData, lineStart + (noteSize * (_LcreatedNotes[currentData].lineNum % 4)), judgeLine - (int)def);
+				}
+				catch (Exception)
+				{
+
 				}
 
-				if(def < -45L)
-				{
-					Console.WriteLine("{0}/{1} deleted",currentData,_LnoteQueue[lineNum].pop());
-					_LcreatedNotes.TryRemove(currentData, out NoteData outData);
-					drawer.sprite.delete(currentData);
-					continue;
-				}
-				drawer.sprite.modPoint(currentData, lineStart + (noteSize * (_LcreatedNotes[currentData].lineNum % 4)), judgeLine - (int)def);
 			}
-
-			//Console.WriteLine(absuoluteMs);
-			
-			/*Parallel.ForEach(_LcreatedNotes.Keys, (currentData) =>
-			{
-				long def = ((_LcreatedNotes[currentData].sec * 1000) + _LcreatedNotes[currentData].ms) - absuoluteMs;
-
-				drawer.sprite.modPoint(currentData, lineStart + (noteSize * (_LcreatedNotes[currentData].lineNum % 4)), judgeLine - (int)def);
-			});*/
 		}
 
 		public void noteProcess(int index)
 		{
 			if (_LnoteQueue[index].head != null)
 			{
-				++noteCount;
+				string currentData = _LnoteQueue[index].pop();
+				_LcreatedNotes.TryRemove(currentData, out NoteData outData);
+				drawer.sprite.delete(currentData);
+
 				++perfect;
 				++currentCombo;
+				judgeChange(0);
 
 				if (maxCombo < currentCombo)
 					maxCombo = currentCombo;
@@ -309,6 +338,16 @@ namespace MelloRin.CSd3d.Scenes
 					_LnoteEffectTimer[index].Start();
 				}
 			}
+		}
+
+		private void judgeChange(int judge)
+		{
+			judgeTimer.Stop();
+
+			judgeShowTime = 0;
+			drawer.sprite.modImage("judge", _LjudgeSprite[judge]);
+
+			judgeTimer.Start();
 		}
 
 		public void keyProcss(Gamepad pad)
@@ -442,14 +481,13 @@ namespace MelloRin.CSd3d.Scenes
 		{
 			//100만×Perfect횟수, 60만×Good횟수, 10만×맥스콤보 이 3개를 모두 더한 뒤 총 노트수만큼 나누고 소수점을 버림
 			double p = 1000000 * perfect;
-			double g = 600000 * good;
 			double max = 100000 * maxCombo;
-
-			updateScore((uint)((p + g + max) / totalNote));
+			score = (int)((p + max) / totalNote);
+			updateScore(score);
 		}
 
 		object scoreLocker = new object();
-		private void updateScore(uint score)
+		private void updateScore(int score)
 		{
 			lock (scoreLocker)
 			{
