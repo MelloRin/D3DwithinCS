@@ -1,8 +1,8 @@
 ﻿using MelloRin.CSd3d.Core;
 using MelloRin.CSd3d.Lib;
+using SharpDX;
 using SharpDX.XInput;
 using System.Threading;
-using System;
 using System.Windows.Forms;
 
 namespace MelloRin.CSd3d.Scenes
@@ -20,12 +20,15 @@ namespace MelloRin.CSd3d.Scenes
 			drawer.targetForm.KeyDown += _EkeyDown;
 
 			drawer.sprite.setBackground("background", new ClickableSprite(D2DSprite.makeBitmapBrush(drawer.sprite.renderTarget, "mainScreen.png"),0,0,0));
+
+			drawer.font.add("anykey", new FontData("Press Anykey", drawer.font.renderTarget, Color4.White, 460, 500, 60));
 		}
 
 		private void _EkeyDown(object sender, KeyEventArgs e)
 		{
-			if(e.KeyCode.HasFlag(Keys.Enter))
-				startPageRunning = false;
+			startPageRunning = false;
+
+			drawer.targetForm.KeyDown -= _EkeyDown;
 		}
 
 		public void run(TaskQueue taskQueue)
@@ -34,7 +37,7 @@ namespace MelloRin.CSd3d.Scenes
 			{
 				Controller controller = new Controller(UserIndex.One);
 
-				while (startPageRunning)
+				while (startPageRunning && drawer.targetForm.Created)
 				{
 					if (controller.IsConnected)
 					{
@@ -61,6 +64,11 @@ namespace MelloRin.CSd3d.Scenes
 			{
 				keyFlag[0] = false;
 			}
+		}
+
+		public void initialize()
+		{
+
 		}
 	}
 }

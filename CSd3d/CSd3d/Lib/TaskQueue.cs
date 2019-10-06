@@ -1,4 +1,4 @@
-﻿namespace MelloRin.CSd3d.Lib
+namespace MelloRin.CSd3d.Lib
 {
 	public class TaskQueue
 	{

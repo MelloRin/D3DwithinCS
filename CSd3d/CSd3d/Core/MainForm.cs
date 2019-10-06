@@ -171,5 +171,10 @@ namespace MelloRin.CSd3d.Core
 
 			Dispose(true);
 		}
+
+		public void initialize()
+		{
+
+		}
 	}
 }

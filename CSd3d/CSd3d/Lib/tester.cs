@@ -1,4 +1,4 @@
-﻿using SharpDX;
+using SharpDX;
 using SharpDX.DirectWrite;
 using System;
 using System.Collections.Generic;

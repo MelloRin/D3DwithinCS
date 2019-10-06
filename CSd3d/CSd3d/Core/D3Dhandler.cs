@@ -1,4 +1,4 @@
-﻿using MelloRin.CSd3d.Lib;
+using MelloRin.CSd3d.Lib;
 using SharpDX;
 using SharpDX.Direct3D;
 using SharpDX.Direct3D11;
@@ -51,6 +51,11 @@ namespace MelloRin.CSd3d.Core
 
 				frame = 0;
 			});
+		}
+
+		public void initialize()
+		{
+
 		}
 
 		public void run(TaskQueue taskQueue)

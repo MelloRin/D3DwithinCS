@@ -1,4 +1,4 @@
-﻿using SharpDX.Direct2D1;
+using SharpDX.Direct2D1;
 using SharpDX.DirectWrite;
 using System;
 

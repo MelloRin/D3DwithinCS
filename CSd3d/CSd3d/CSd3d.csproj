@@ -75,6 +75,7 @@
     <Compile Include="Core\D3Dhandler.cs" />
     <Compile Include="Lib\Notes\NoteManager.cs" />
     <Compile Include="Lib\Notes\NoteQueue.cs" />
+    <Compile Include="Lib\ScoreData.cs" />
     <Compile Include="Scenes\Game.cs" />
     <Compile Include="Lib\FontData.cs" />
     <Compile Include="Lib\FontLoader.cs" />
@@ -91,6 +92,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Scenes\MusicSelect.cs" />
+    <Compile Include="Scenes\ResultScreen.cs" />
     <Compile Include="Scenes\StartPage.cs" />
   </ItemGroup>
   <ItemGroup>

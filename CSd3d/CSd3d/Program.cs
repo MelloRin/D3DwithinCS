@@ -37,6 +37,7 @@ namespace MelloRin.CSd3d
 			MainForm mainForm = new MainForm();
 			PublicDataManager.currentTaskQueue.addTask(mainForm);
 			D3Dhandler drawer = new D3Dhandler(mainForm);
+			
 			PublicDataManager.currentTaskQueue.addTask(drawer);
 			PublicDataManager.currentTaskQueue.addTask(new StartPage(drawer));
 

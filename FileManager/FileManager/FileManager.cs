@@ -1,22 +1,29 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.IO;
+using System.Text;
 
 namespace MelloRin.FileManager
 {
 	public static class FileManager
 	{
-		public static readonly string currentDir = Directory.GetCurrentDirectory();
-		public static readonly string saveFileDir = String.Format(@"{0}\res\", currentDir);
-		public static readonly string saveFileName = saveFileDir + "savedata.mlr";
+        public static readonly string currentDir = Directory.GetCurrentDirectory();
+        public static readonly string saveFileDir = Path.Combine(currentDir, "res");
 
-		public static void loadData(out SaveFileDataSet dataSet)
+        //String.Format(@"{0}/saveData/", currentDir);
+        //public static readonly string saveFileDir = String.Format(@"{0}\res\", currentDir);
+        public static readonly string saveFileName = "savedata.mlr";
+        //saveFileDir + "savedata.mlr";
+
+        public static void loadData(out SaveFileDataSet dataSet)
 		{
-			if (File.Exists(saveFileName))
-			{
-				StreamReader reader = new StreamReader(saveFileName);
 
-				string rawData = reader.ReadLine();
+            Directory.CreateDirectory(saveFileDir);
+            if (File.Exists(saveFileName))
+            {
+                StreamReader reader = new StreamReader(Path.Combine(saveFileDir, saveFileName));
+
+                string rawData = reader.ReadLine();
 				reader.Close();
 				string key = rawData.Substring(0, 32);
 				rawData = rawData.Substring(32);
@@ -87,13 +94,25 @@ namespace MelloRin.FileManager
 			}
 			string output = uuid + AES256_manager.encrypt(raw_data, uuid);
 
-			if (File.Exists(saveFileName))
-			{
-				File.Delete(saveFileName);
-			}
 
-			StreamWriter writer = new StreamWriter(saveFileName);
-			writer.Write(output);
+            Directory.CreateDirectory(saveFileDir);
+            string dirTemp = Path.Combine(saveFileDir, saveFileName);
+            if (File.Exists(dirTemp))
+            {
+                File.Delete(dirTemp);
+            }
+
+            
+
+            StreamWriter writer = new StreamWriter(dirTemp);
+
+
+
+            //byte[] byteArr = Encoding.UTF8.GetBytes(output);
+
+            //File.WriteAllBytes(saveFileName, byteArr);
+
+            writer.Write(output);
 			writer.Close();
 		}
 	}
