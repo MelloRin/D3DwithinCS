@@ -7,13 +7,11 @@ namespace MelloRin.FileManager
 {
 	public static class FileManager
 	{
+		
         public static readonly string currentDir = Directory.GetCurrentDirectory();
         public static readonly string saveFileDir = Path.Combine(currentDir, "res");
 
-        //String.Format(@"{0}/saveData/", currentDir);
-        //public static readonly string saveFileDir = String.Format(@"{0}\res\", currentDir);
         public static readonly string saveFileName = "savedata.mlr";
-        //saveFileDir + "savedata.mlr";
 
         public static void loadData(out SaveFileDataSet dataSet)
 		{
