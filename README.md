@@ -1,2 +1,4 @@
 # D3DwithinCS
-DirectX in C#
+outdated repo...
+
+goto https://github.com/MelloRin/BeatMaker instead
